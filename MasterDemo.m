@@ -5,17 +5,23 @@ close all
 addpath([pwd '/' addpath(genpath("LLSM-test/"))])
 
 % get predefine variables 
-getParameters;
+getParameters; %modify image parameter here
 CalculatePhysics;
 
 % generate pupil 
 % [SWPupil,SWMask] = GetSWPairPupil(ProfileType,NA1Ideal,NA2Ideal,deltaNA1,deltaNA2,...
-%                          Weighting,WeightRatio=I(NA1)/I(NA2));
-[SWPupil,SWMask] = GetSWPairPupil('Tophat',0.4,0.2,0.08,0.16,1,1);
+%                          NA1Weighting,WeightRatio=I(NA1)/I(NA2));
+[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('gaussian',0.4,0.20,0.08,0.16,1,sqrt(2));
 
 % Coherent/Incoherent Propagation of SW pairs
 % [PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil,Plot=1/0,Save=1/0);
-[SWPairPSF_Coherent,SWPairPSF_Incoherent] = SimulateSWPair(SWPupil,1,1);
+[PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil);
+
+% Plot SWPairPSF
+PrettyPlotSWPair(SWPupil,SWMask,SWPupilMetaData,PSFCoherent,PSFIncoherent);
+
+% Save Result 
+SaveSWPair(PSFCoherent,PSFIncoherent);
 
 % Create general Lattice
 % [LatticePupil,LatticeMask] = GetSWPairPupil(LatticeType,ProfileType,NAIdeal,deltaNA,Weighting);
