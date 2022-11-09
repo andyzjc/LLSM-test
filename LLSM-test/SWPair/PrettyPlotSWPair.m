@@ -145,7 +145,7 @@ coherent = plot( KZ_exc, coherent_OTF(:,(N+1)/2));
     ylabel("z(\lambda_{exc}/n)")
     axis image
     colorbar
-    add_intensityyz.Parent.YLim = [-20,20];
+    add_intensityyz.Parent.YLim = [-40,40];
 
     subplot(3,3,8)
     add_pupilyz = imagesc(Y_exc((N+1)/2:end),Z_exc,squeeze(PSFCoherent(:,(N+1)/2,(N+1)/2:end)));
@@ -154,7 +154,7 @@ coherent = plot( KZ_exc, coherent_OTF(:,(N+1)/2));
     ylabel("z(\lambda_{exc}/n)")
     axis image
     colorbar
-    add_pupilyz.Parent.YLim = [-20,20];
+    add_pupilyz.Parent.YLim = [-40,40];
 
     % Calculate yFWHM
     yPSF_exc = squeeze(PSFIncoherent((N+1)/2,(N+1)/2,:));

@@ -12,7 +12,7 @@ CalculatePhysics;
 % generate pupil 
 % [SWPupil,SWMask] = GetSWPairPupil(ProfileType,NA1Ideal,NA2Ideal,deltaNA1,deltaNA2,...
 %                          NA1Weighting,WeightRatio=I(NA1)/I(NA2));
-[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('gaussian',0.4,0.20,0.08,0.16,1,sqrt(2));
+[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('tophat',0.4,0.2,0.04,0.08,1,1/2);
 
 % Coherent/Incoherent Propagation of SW pairs
 % [PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil);
