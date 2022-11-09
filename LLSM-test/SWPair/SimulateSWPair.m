@@ -1,7 +1,5 @@
 function [PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil)
     % Stimulate 3D PSF of pair of SW coherently and incoherently
-    % Plot=1/0, when Plot=1, Figures will be plotted
-    % Save=1/0, when Save=1, Result will be saved
     % SWPupil = NxNx2, SWPupil(:,:,1) = Pupil of SW NA1 (outer)
 
 getParameters;

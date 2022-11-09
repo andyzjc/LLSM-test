@@ -1,1 +1,0 @@
-function SaveSWPair(PSFCoherent,PSFIncoherent)
