@@ -174,7 +174,7 @@ coherent = plot( KZ_exc, coherent_OTF(:,(N+1)/2));
     add_pupil_line_yz = plot(Y_exc, squeeze(PSFCoherent((N+1)/2,(N+1)/2,:)) );
         add_pupil_line_yz.Color = 'g';
         add_pupil_line_yz.LineWidth = 3;
-    title("Propagation Profile,Z=0,X=0,Incoherent yFWHM=" + num2str(yFWHM) + "/lambda")
+    title("Z=0,X=0,Incoherent yFWHM=" + num2str(yFWHM) + "/lambda")
     xlabel("y(\lambda_{exc}/n)")
     ylabel("Normalized Intensity")
     legend("Incoherent","Coherent")

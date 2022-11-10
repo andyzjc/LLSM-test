@@ -2,7 +2,7 @@ clear all
 close all
 
 %% Simulation without aberrration
-% addpath([pwd '/' addpath(genpath("LLSM-test/"))])
+addpath([pwd '/' addpath(genpath("LLSM-test/"))])
 
 % get predefine variables 
 getParameters; %modify image parameter here
@@ -12,10 +12,11 @@ CalculatePhysics;
 % generate pupil 
 % [SWPupil,SWMask] = GetSWPairPupil(ProfileType,NA1Ideal,NA2Ideal,deltaNA1,deltaNA2,...
 %                          NA1Weighting,WeightRatio=I(NA1)/I(NA2));
-[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('tophat',0.4,0.2,0.04,0.08,1,1/2);
+[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('gaussian',0.4,0.126,0.08,0.253,1,1);
 
 % Coherent/Incoherent Propagation of SW pairs
-% [PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil);
+% [PSFCoherent,PSFIncoher
+% ent] = SimulateSWPair(SWPupil);
 [PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil);
 
 % Plot SWPairPSF
@@ -24,7 +25,7 @@ PrettyPlotSWPair(SWPupil,SWMask,SWPupilMetaData,PSFCoherent,PSFIncoherent);
 %% Lattice
 % Create general Lattice
 % [LatticePupil,LatticeMask] = GetLatticePupil(LatticeType,ProfileType,NAIdeal,deltaNA,Weighting);
-[LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('hex','gaussian',0.4,0.08,1);
+[LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('square','tophat',0.4,0.08,1);
 
 % Simulate lattice
 % [LatticePSF_3D] = SimulateLattice(LatticePupil)

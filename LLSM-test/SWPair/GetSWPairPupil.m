@@ -33,21 +33,26 @@ kzposition2 = k_ideal(2) .* sind(theta) ./deltak; % pixel
 deltaNApixels2 = k_deltaNA(2) ./ deltak;
 
 if contains(ProfileType,'gaussian')
-    gaussian1 = exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA(1)/2).^2) );
-    gaussian2 = exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA(2)/2).^2) );
     % NA1 Pupil
+    gaussian1 = exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA(1)/2).^2) );
     for j = 1:length(kxposition1)
-    SWPupil( ...
-        (N+1)/2 + round(kzposition1(j)),...
-        (N+1)/2 + round(kxposition1(j)),1) = 1;
+        SWPupil( ...
+            (N+1)/2 + round(kzposition1(j)),...
+            (N+1)/2 + round(kxposition1(j)),1) = 1;
     end
     SWPupil(:,:,1) = NA1Weighting .* conv2(SWPupil(:,:,1),gaussian1,'same');
 
-    % NA2 Pupil
-    for j = 1:length(kxposition2)
-    SWPupil( ...
-        (N+1)/2 + round(kzposition2(j)),...
-        (N+1)/2 + round(kxposition2(j)),2) = 1;
+    if NAmin(2) > 0
+        gaussian2 = exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA(2)/2).^2) );
+        % NA2 Pupil
+        for j = 1:length(kxposition2)
+        SWPupil( ...
+            (N+1)/2 + round(kzposition2(j)),...
+            (N+1)/2 + round(kxposition2(j)),2) = 1;
+        end
+    else
+        gaussian2 = exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA(2)).^2) );
+        SWPupil( (N+1)/2,(N+1)/2, 2) = 1;
     end
     SWPupil(:,:,2) = (NA1Weighting ./ WeightRatio) .* conv2(SWPupil(:,:,2),gaussian2,'same');
 
