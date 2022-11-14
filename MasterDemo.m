@@ -1,31 +1,32 @@
+%% Simulation without aberrration
 clear all
 close all
 
-%% Simulation without aberrration
 addpath([pwd '/' addpath(genpath("LLSM-test/"))])
 
 % get predefine variables 
 getParameters; %modify image parameter here
 CalculatePhysics;
 
-%% SW Pair
+%% Simulation of SW Pair
 % generate pupil 
 % [SWPupil,SWMask] = GetSWPairPupil(ProfileType,NA1Ideal,NA2Ideal,deltaNA1,deltaNA2,...
 %                          NA1Weighting,WeightRatio=I(NA1)/I(NA2));
-[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('gaussian',0.4,0.126,0.08,0.253,1,1);
+[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('tophat',0.4,0.2,...
+                                                           0.04,0.08,...
+                                                           1,1);
 
 % Coherent/Incoherent Propagation of SW pairs
-% [PSFCoherent,PSFIncoher
-% ent] = SimulateSWPair(SWPupil);
+% [PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil);
 [PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil);
 
 % Plot SWPairPSF
 PrettyPlotSWPair(SWPupil,SWMask,SWPupilMetaData,PSFCoherent,PSFIncoherent);
 
-%% Lattice
+%% Simulation of Lattice
 % Create general Lattice
 % [LatticePupil,LatticeMask] = GetLatticePupil(LatticeType,ProfileType,NAIdeal,deltaNA,Weighting);
-[LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('square','tophat',0.4,0.08,1);
+[LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('hex','tophat',0.4,0.04,1);
 
 % Simulate lattice
 % [LatticePSF_3D] = SimulateLattice(LatticePupil)
@@ -35,19 +36,53 @@ PrettyPlotSWPair(SWPupil,SWMask,SWPupilMetaData,PSFCoherent,PSFIncoherent);
 %PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,LatticePSFDithered);
 PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,LatticePSFDithered);
 
-%% Simulation with aberrration
+%% Simulation of SW Pair with a single aberrration mode 
+% Get single zernike mode function
+% Phase = GetSingleZmodePupil(RadialOrder,AngularFrequency,PhaseAmplitude);
+Phase = GetSingleZmodePupil(1,-1,10);
 
-% Get zernike mode pupil function 
-% [ZmodePupil] = GetZmodePupil(ZModeOrder);
-[ZmodePupil] = GetZmodePupil(1);
+% [SWPupil,SWMask] = GetSWPairPupil(ProfileType,NA1Ideal,NA2Ideal,deltaNA1,deltaNA2,...
+%                          NA1Weighting,WeightRatio=I(NA1)/I(NA2));
+[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('tophat',0.4,0.1265,...
+                                                           0.08,0.253,...
+                                                           1,1); 
+AberratedSWPupil = SWPupil .* Phase;
+
+% Simulate Single mode aberrated SW Pair
+% [PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil);
+[AberratedPSFCoherent,AberratedPSFIncoherent] = imulateSWPair(AberratedSWPupil);
+
+% Plot SWPairPSF
+PrettyPlotSWPair(AberratedSWPupil,SWMask,SWPupilMetaData,AberratedPSFCoherent,AberratedPSFIncoherent);
+
+%% Simulation of Lattice with a single aberrration mode 
+% Get single zernike mode function
+% Phase = GetSingleZmodePupil(RadialOrder,AngularFrequency,PhaseAmplitude);
+Phase = GetSingleZmodePupil(1,-1,10);
+
+% [LatticePupil,LatticeMask] = GetLatticePupil(LatticeType,ProfileType,NAIdeal,deltaNA,Weighting);
+[LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('hex','tophat',0.4,0.04,1);
+AberratedLatticePupil = LatticePupil.*Phase;
+
+% Simulate Single mode aberrated lattice
+% [LatticePSF_3D] = SimulateLattice(LatticePupil)
+[AberratedLatticePSF,AberratedLatticePSFDithered] =  SimulateLattice(AberratedLatticePupil);
+
+%Plot Lattice
+%PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,LatticePSFDithered);
+PrettyPlotLattice(AberratedLatticePupil,LatticeMask,LatticeMetaData,AberratedLatticePSF,AberratedLatticePSFDithered);
+
+%% Simulation with all aberration mode
+% Show all zernike mode function
+GetZmodePupil(6);
 
 % Simulate aberration for SW Pair
-% [PSFCoherent,PSFIncoherent] = SimulateSW PairAberrated(SWPupil,ZModePupil,Plot=1/0,Save=1/0)
-[AberratedSWPSF_Coherent,AberratedSWPSF_Incoherent] = SimulateSWPairAberrated(SWPupil,ZModePupil,1,1);
+% [AberratedPSFCoherent,AberratedPSFIncoherent] = SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
+SimulateSWPairAberration(SWPupil,6,10);
 
 % Simulate aberration for Lattice
-% [AberratedPSF] = SimulateLattice(LatticePupil,ZModePupil,Plot=1/0,Save=1/0)
-[AberratedLatticePSF] = SimulateLatticeAberrated(LatticePupil,ZModePupil,1,1);
+% [PSFCoherent,PSFIncoherent] = SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
+SimulateLatticeAberration(LatticePupil,6,10);
 
 
 

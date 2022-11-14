@@ -20,7 +20,7 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     image11.Parent.YLim = [-0.5,0.5];
     colorbar;    
     
-    Illum_mask = imfuse(LatticePupil,LatticeMask,"falsecolor","ColorChannels","green-magenta");
+    Illum_mask = imfuse(real(LatticePupil),LatticeMask,"falsecolor","ColorChannels","green-magenta");
     subplot(1,2,2)
     image15 = imagesc( KX_exc, KZ_exc,...
                   Illum_mask);

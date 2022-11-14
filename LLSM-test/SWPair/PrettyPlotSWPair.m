@@ -23,11 +23,11 @@ WeightingRatio = SWPupilMeta.WeightingRatio;
     colormap(hot(256))
 
     subplot(1,2,1)
-Illum_mask1 = imfuse(Pupil1,A_mask1,"falsecolor","ColorChannels","green-magenta");
-Illum_mask2 = imfuse(Pupil2,A_mask2,"falsecolor","ColorChannels","green-magenta");
+Illum_mask1 = imfuse(real(Pupil1),A_mask1,"falsecolor","ColorChannels","green-magenta");
+Illum_mask2 = imfuse(real(Pupil2),A_mask2,"falsecolor","ColorChannels","green-magenta");
 Illum_mask = Illum_mask1 + Illum_mask2;
 image15 = imagesc( KX_exc, KZ_exc,...
-                  Illum_mask);
+                  real(Illum_mask));
     title("beam1=" + num2str(beam1NAmax) + "/" + num2str(beam1NAmin)...
             +",beam2=" + num2str(beam2NAmax) + "/" + num2str(beam2NAmin) ) 
     xlabel("k_x/(4\pin/\lambda_{exc})")
@@ -58,7 +58,7 @@ Pupils = imagesc(KZ_exc,KX_exc,real(Pupil_sum));
     subplot(3,3,1)
     add_intensity = imagesc(X_exc,Z_exc,PSFIncoherent(:,:,(N+1)/2));
     title("Incoherent, Y=0")
-    xlabel("/(\lambda_{exc}/n)")
+    xlabel("x/(\lambda_{exc}/n)")
     ylabel("z /(\lambda_{exc}/n)")
     axis image
     colorbar
