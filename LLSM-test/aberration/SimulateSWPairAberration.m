@@ -2,7 +2,7 @@ function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
     getParameters; %modify image parameter here
     CalculatePhysics;
     
-    [theta,r] = cart2pol(kx_exc./(1.2./n*k_wave),kz_exc./(1.2./n*k_wave));
+    [theta,r] = cart2pol(kx_exc./(0.6./n*k_wave),kz_exc./(0.6./n*k_wave));
     idx = r<=1;
     phase = zeros(size(kx_exc));
 
@@ -31,10 +31,16 @@ function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
         y = zernfun(RadialOrder,AngularFrequency,r(idx),theta(idx));
 
         AngularFrequency_iteration = 1:1:length(AngularFrequency);
-        for k = 1:length(RadialOrder)   
+        for k = 1:length(RadialOrder)  
+
             phase(idx) = y(:,k);
-            AberratedPupil1 = squeeze(SWPupil(:,:,1)) .* exp(PhaseAmplitude.* 1i.*pi.*phase);
-            AberratedPupil2 = squeeze(SWPupil(:,:,2)) .* exp(PhaseAmplitude.* 1i.*pi.*phase);
+            AberratedPupil1 = zeros(size(phase));
+            AberratedPupil2 = zeros(size(phase));
+            SWPupil1 = squeeze(SWPupil(:,:,1));
+            SWPupil2 = squeeze(SWPupil(:,:,2));
+
+            AberratedPupil1(idx) = SWPupil1(idx) .* exp(PhaseAmplitude.* 1i.*pi.*phase(idx));
+            AberratedPupil2(idx) = SWPupil2(idx) .* exp(PhaseAmplitude.* 1i.*pi.*phase(idx));
 %             AberratedPupilSum = squeeze(SWPupil(:,:,1) + SWPupil(:,:,2)) .* exp(1i.*pi.*phase);
 
 %             AberratedPSFCoherent= zeros(N,N,N);

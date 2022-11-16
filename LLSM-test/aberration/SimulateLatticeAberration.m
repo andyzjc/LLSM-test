@@ -2,7 +2,7 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
     getParameters; %modify image parameter here
     CalculatePhysics;
     
-    [theta,r] = cart2pol(kx_exc./(1.2./n*k_wave),kz_exc./(1.2./n*k_wave));
+    [theta,r] = cart2pol(kx_exc./(0.6./n*k_wave),kz_exc./(0.6./n*k_wave));
     idx = r<=1;
     phase = zeros(size(kx_exc));
 
@@ -32,8 +32,9 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
 
         AngularFrequency_iteration = 1:1:length(AngularFrequency);
         for k = 1:length(RadialOrder)
+            AberratedPupil = zeros(size(phase));
             phase(idx) = y(:,k);
-            AberratedPupil = LatticePupil .* exp(PhaseAmplitude.* 1i.*pi.*phase);
+            AberratedPupil(idx) = LatticePupil(idx) .* exp(PhaseAmplitude.* 1i.*pi.*phase(idx));
             
             AberratedLatticePSF = zeros(N,N, N);
             AberratedLatticePSFDithered = zeros(N,N, N);
