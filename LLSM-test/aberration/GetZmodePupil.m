@@ -2,7 +2,7 @@ function GetZmodePupil(MaxRadialOrder)
     getParameters; %modify image parameter here
     CalculatePhysics;
     
-    [theta,r] = cart2pol(kx_exc./(1.2./n*k_wave),kz_exc./(1.2./n*k_wave));
+    [theta,r] = cart2pol(kx_exc./(0.6./n*k_wave),kz_exc./(0.6./n*k_wave));
     idx = r<=1;
     z = nan(size(kx_exc));
 
@@ -19,6 +19,7 @@ function GetZmodePupil(MaxRadialOrder)
             pcolor(KX_exc,KZ_exc,z), shading interp
             set(gca,'XTick',[],'YTick',[])
             axis square
+            colorbar
             title(['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'])
         end
     end
