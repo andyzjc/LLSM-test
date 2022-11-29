@@ -28,7 +28,7 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
     for i = 0:MaxRadialOrder
         RadialOrder = i*ones(1,i+1);
         AngularFrequency = -i:2:i;
-        y = zernfun(RadialOrder,AngularFrequency,r(idx),theta(idx));
+        y = zernfun(RadialOrder,AngularFrequency,r(idx),theta(idx),'norm');
 
         AngularFrequency_iteration = 1:1:length(AngularFrequency);
         for k = 1:length(RadialOrder)

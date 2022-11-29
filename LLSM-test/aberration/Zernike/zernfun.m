@@ -11,10 +11,10 @@ function z = zernfun(n,m,r,theta,nflag)
 %   pair, and one row for every (R,THETA) pair.
 %
 %   Z = ZERNFUN(N,M,R,THETA,'norm') returns the normalized Zernike
-%   functions.  The normalization factor sqrt((2-delta(m,0))*(n+1)/pi),
-%   with delta(m,0) the Kronecker delta, is chosen so that the integral
-%   of (r * [Znm(r,theta)]^2) over the unit circle (from r=0 to r=1,
-%   and theta=0 to theta=2*pi) is unity.  For the non-normalized
+%   functions.  Coefficient of an orthonormal polynomial term represents 
+%   its standard deviation (termed "um RMS" in the parlance)
+
+%   For the non-normalized
 %   polynomials, max(Znm(r=1,theta))=1 for all [n,m].
 %
 %   The Zernike functions are an orthogonal basis on the unit circle.
@@ -25,21 +25,21 @@ function z = zernfun(n,m,r,theta,nflag)
 %
 %       n    m    Zernike function             Normalization
 %       ----------------------------------------------------
-%       0    0    1                              1/sqrt(pi)
-%       1    1    r * cos(theta)                 2/sqrt(pi)
-%       1   -1    r * sin(theta)                 2/sqrt(pi)
-%       2    2    r^2 * cos(2*theta)             sqrt(6/pi)
-%       2    0    (2*r^2 - 1)                    sqrt(3/pi)
-%       2   -2    r^2 * sin(2*theta)             sqrt(6/pi)
-%       3    3    r^3 * cos(3*theta)             sqrt(8/pi)
-%       3    1    (3*r^3 - 2*r) * cos(theta)     sqrt(8/pi)
-%       3   -1    (3*r^3 - 2*r) * sin(theta)     sqrt(8/pi)
-%       3   -3    r^3 * sin(3*theta)             sqrt(8/pi)
-%       4    4    r^4 * cos(4*theta)             sqrt(10/pi)
-%       4    2    (4*r^4 - 3*r^2) * cos(2*theta) sqrt(10/pi)
-%       4    0    6*r^4 - 6*r^2 + 1              sqrt(5/pi)
-%       4   -2    (4*r^4 - 3*r^2) * sin(2*theta) sqrt(10/pi)
-%       4   -4    r^4 * sin(4*theta)             sqrt(10/pi)
+%       0    0    1                              *  1
+%       1    1    r * cos(theta)                 *  2
+%       1   -1    r * sin(theta)                 *  2
+%       2    2    r^2 * cos(2*theta)             *  sqrt(6)
+%       2    0    (2*r^2 - 1)                    *  sqrt(3)
+%       2   -2    r^2 * sin(2*theta)             *  sqrt(6)
+%       3    3    r^3 * cos(3*theta)             *  sqrt(8)
+%       3    1    (3*r^3 - 2*r) * cos(theta)     *  sqrt(8)
+%       3   -1    (3*r^3 - 2*r) * sin(theta)     *  sqrt(8)
+%       3   -3    r^3 * sin(3*theta)             *  sqrt(8)
+%       4    4    r^4 * cos(4*theta)             *  sqrt(10)
+%       4    2    (4*r^4 - 3*r^2) * cos(2*theta) *  sqrt(10)
+%       4    0    6*r^4 - 6*r^2 + 1              *  sqrt(5)
+%       4   -2    (4*r^4 - 3*r^2) * sin(2*theta) *  sqrt(10)
+%       4   -4    r^4 * sin(4*theta)             *  sqrt(10)
 %       ----------------------------------------------------
 %
 %   Example 1:
@@ -173,7 +173,7 @@ for j = 1:length(n)
     end
     
     if isnorm
-        z(:,j) = z(:,j)*sqrt((1+(m(j)~=0))*(n(j)+1)/pi);
+        z(:,j) = z(:,j) * zernfun_normalization(n,m) ; %was: *sqrt((1+(m(j)~=0))*(n(j)+1)/pi);      
     end
 end
 % END: Compute the Zernike Polynomials
@@ -192,3 +192,6 @@ if any(idx_neg)
 end
 
 % EOF zernfun
+
+
+    
