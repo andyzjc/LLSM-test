@@ -120,7 +120,7 @@ function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
             h2 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig2);
                 h2.NextPlot = "add";
                 plot(h2,Z_exc,zPSF,'LineWidth',2,'Color','r')
-                plot(h2,Z_exc,UnaberratedzPSF,'LineWidth',2,'Color','g')
+                plot(h2,Z_exc,UnaberratedzPSF,'LineWidth',1,'Color','g')
                 h2.XAxis.Label.String = "z(\lambda_{exc}/n)";
                 h2.XAxis.Limits = [-20,20];
                 h2.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
@@ -144,9 +144,10 @@ function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
             h4 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig4);
                 h4.NextPlot = "add";
                 plot(h4,KZ_exc,zOTF,'LineWidth',2,'Color','r')
-                plot(h4,KZ_exc,UnaberratedzOTF,'LineWidth',2,'Color','g')
+                plot(h4,KZ_exc,UnaberratedzOTF,'LineWidth',1,'Color','g')
                 h4.XAxis.Label.String = "k_z/(4\pin/\lambda_{exc})";
                 h4.XAxis.Limits = [-0.5,0.5];
+                h4.XAxis.TickValues = linspace(-0.5,0.5,11);
                 h4.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h4.XGrid = 'on';
                 h4.YGrid = 'on';
@@ -167,7 +168,7 @@ function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
             h6 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig6);
                 h6.NextPlot = "add";
                 plot(h6,Y_exc,yPSF,'LineWidth',2,'Color','r')
-                plot(h6,Y_exc,UnaberratedyPSF,'LineWidth',2,'Color','g')
+                plot(h6,Y_exc,UnaberratedyPSF,'LineWidth',1,'Color','g')
                 h6.XAxis.Label.String = "y(\lambda_{exc}/n)";
                 h6.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}' 'yFWHM=' num2str(yFWHM) '/lambda'];
                 h6.XGrid = 'on';
@@ -190,7 +191,7 @@ function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
             h8 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig8);
                 h8.NextPlot = "add";
                 plot(h8,Z_exc,OverallzPSF,'LineWidth',2,'Color','r')
-                plot(h8,Z_exc,UnaberratedOverallzPSF,'LineWidth',2,'Color','g')
+                plot(h8,Z_exc,UnaberratedOverallzPSF,'LineWidth',1,'Color','g')
                 h8.XAxis.Label.String = "z(\lambda_{exc}/n)";
                 h8.XAxis.Limits = [-20,20];
                 h8.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
@@ -214,9 +215,10 @@ function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
              h10 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig10);
                 h10.NextPlot = "add";
                 plot(h10,KZ_exc,OverallzOTF,'LineWidth',2,'Color','r')
-                plot(h10,KZ_exc,UnaberratedOverallzOTF,'LineWidth',2,'Color','g')
+                plot(h10,KZ_exc,UnaberratedOverallzOTF,'LineWidth',1,'Color','g')
                 h10.XAxis.Label.String = "k_z/(4\pin/\lambda_{exc})";
                 h10.XAxis.Limits = [-0.5,0.5];
+                h10.XAxis.TickValues = linspace(-0.5,0.5,11);
                 h10.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h10.XGrid = 'on';
                 h10.YGrid = 'on';
@@ -286,7 +288,7 @@ function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
                 h2_image.Parent.XLim = [-20,20];
                 h2_image.Parent.YAxis.TickValues = linspace(0,1,11);
                 h2_image.Parent.XAxis.TickValues = linspace(-20,20,21);
-                h2_image_Unaberrated.LineWidth = 2;
+                h2_image_Unaberrated.LineWidth = 1;
                 h2_image_Unaberrated.Color = 'g';
                 lgd = legend(h2,"Aberrated","Normal");
                 lgd.FontSize = 3;
@@ -348,7 +350,7 @@ function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
                 h4.XLim = [-0.5,0.5];
                 h4_image.Parent.XAxis.TickValues = linspace(-0.5,0.5,11);
                 h4_image_unaberrated.Color = 'g';
-                h4_image_unaberrated.LineWidth = 2;
+                h4_image_unaberrated.LineWidth = 1;
                 lgd = legend(h4,"Aberrated","Normal");
                 lgd.FontSize = 3;
                 grid on
