@@ -4,11 +4,11 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
 
     % Unaberrated
     [LatticePSF,LatticePSFDithered] = SimulateLattice(LatticePupil);
-    UnaberratedxzPSF = LatticePSF(:,:,(N+1)/2); UnaberratedxzPSF = UnaberratedxzPSF/max(max(UnaberratedxzPSF));
+    UnaberratedxzPSF = LatticePSFDithered(:,:,(N+1)/2); UnaberratedxzPSF = UnaberratedxzPSF/max(max(UnaberratedxzPSF));
     UnaberratedzPSF = UnaberratedxzPSF(:,(N+1)/2); 
     UnaberratedxzOTF = abs(fftshift(fft2(UnaberratedxzPSF))); UnaberratedxzOTF = UnaberratedxzOTF/max(max(UnaberratedxzOTF));
     UnaberratedzOTF = UnaberratedxzOTF(:,(N+1)/2); 
-    UnaberratedyzPSF = squeeze(LatticePSF(:,(N+1)/2,:)); UnaberratedyzPSF = UnaberratedyzPSF/max(max(UnaberratedyzPSF));
+    UnaberratedyzPSF = squeeze(LatticePSFDithered(:,(N+1)/2,:)); UnaberratedyzPSF = UnaberratedyzPSF/max(max(UnaberratedyzPSF));
     UnaberratedyPSF = UnaberratedyzPSF((N+1)/2,:);
     
     % Overall Unaberrated 
@@ -51,6 +51,9 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
     fig10 = figure(10);
         fig10.Name = 'Overall zOTF';
         fig10.WindowState = 'maximized';
+    fig12 = figure(12);
+        fig12.Name = 'Excitation xzPSF NonDither';
+        fig12.WindowState = 'maximized';
 
     MinRadialOrder = 0;
     for i = MinRadialOrder:MaxRadialOrder
@@ -76,11 +79,11 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
             AberratedLatticePSF = AberratedLatticePSF/max(max(max(AberratedLatticePSF)));
             AberratedLatticePSFDithered = AberratedLatticePSFDithered/max(max(max(AberratedLatticePSFDithered)));
 
-            xzPSF = AberratedLatticePSF(:,:,(N+1)/2); xzPSF = xzPSF/max(max(xzPSF));
+            xzPSF = AberratedLatticePSFDithered(:,:,(N+1)/2); xzPSF = xzPSF/max(max(xzPSF));
             zPSF = xzPSF(:,(N+1)/2); 
             xzOTF = abs(fftshift(fft2(xzPSF))); xzOTF = xzOTF/max(max(xzOTF));
             zOTF = xzOTF(:,(N+1)/2); 
-            yzPSF = squeeze(AberratedLatticePSF(:,(N+1)/2,:)); yzPSF = yzPSF/max(max(yzPSF));
+            yzPSF = squeeze(AberratedLatticePSFDithered(:,(N+1)/2,:)); yzPSF = yzPSF/max(max(yzPSF));
             yPSF = yzPSF((N+1)/2,:); 
 
             % Calculate Overall PSF and OTF
@@ -119,6 +122,7 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
                 lgd.FontSize = 3;
                 grid on
                 h2.NextPlot = "replace";
+                
 
             h3 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig3);
                 imagesc(h3,KX_exc,KZ_exc,xzOTF)
@@ -213,6 +217,16 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
                 lgd.FontSize = 3;
                 grid on
                 h10.NextPlot = "replace";           
+                
+            h12 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig12);
+                imagesc(h12,X_exc,Z_exc,AberratedLatticePSF(:,:,(N+1)/2) / max(max(AberratedLatticePSF(:,:,(N+1)/2))));
+                h12.XAxis.Label.String = "x(\lambda_{exc}/n)";
+                h12.YAxis.Label.String = "z(\lambda_{exc}/n)";
+                h12.Colormap = colormap(hot(256));
+                h12.XAxis.Limits = [-20,20];
+                h12.YAxis.Limits = [-20,20];
+                h12.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
+                h12.DataAspectRatio = [1,1,1];
                 
             for jj = (N+1)/2-100:10:(N+1)/2+100
                 fig11 = figure('Name','Profile','WindowState','maximized','Visible','off');
@@ -428,4 +442,4 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
     exportgraphics(fig8, [pwd  '/OverallzPSF.png'],'Resolution',300)
     exportgraphics(fig9, [pwd  '/OverallxzOTF.png'],'Resolution',300)
     exportgraphics(fig10, [pwd  '/OverallzOTF.png'],'Resolution',300)
-
+    exportgraphics(fig12, [pwd  '/ExcitationxzPSFNonDither.png'],'Resolution',300)

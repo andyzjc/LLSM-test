@@ -52,7 +52,6 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     
     subplot(2,4,2)
     zPSF_exc = xzPSF_exc(:,(N+1)/2);
-    zPSF_exc = zPSF_exc/max(max(zPSF_exc));
     image22 = plot(Z_exc,zPSF_exc);
     title("Z-Excitation PSF, " + ...
         "X=0" + ",Y=0" )
@@ -81,7 +80,7 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     image18.Parent.YLim = [-0.5,0.5];
     
     subplot(2,4,4)
-    zOTF_exc = abs(xzOTF_exc(:,(N+1)/2)) / max(abs(xzOTF_exc(:,(N+1)/2)));
+    zOTF_exc = abs(xzOTF_exc(:,(N+1)/2));
     image23 = plot( KZ_exc, zOTF_exc);
     title("Z-Excitation-OTF, " + "K_X=0, " + "K_Y=0")
     ylabel("Normalized a.u. ")
@@ -110,7 +109,6 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     
     subplot(2,4,6)
     zPSF_exc_dither = xzPSF_exc_dither(:,(N+1)/2);
-    zPSF_exc_dither = zPSF_exc_dither/max(zPSF_exc_dither);
     image110 = plot( Z_exc, zPSF_exc_dither);
         title("Z-Excitation PSF, " + ...
         "X=0" + ",Y=0" )
@@ -138,7 +136,7 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     image111.Parent.YLim = [-0.5,0.5];
     
     subplot(2,4,8)
-    zOTF_exc_dither = abs(xzOTF_exc_dither(:,(N+1)/2)) / max(abs(xzOTF_exc_dither(:,(N+1)/2)) );
+    zOTF_exc_dither = abs(xzOTF_exc_dither(:,(N+1)/2));
     image112 = plot( KZ_exc, zOTF_exc_dither);
     title("Dithered Z-Excitation-OTF, " + "K_X=0, " + "K_Y=0")
     ylabel("Normalized a.u. ")
