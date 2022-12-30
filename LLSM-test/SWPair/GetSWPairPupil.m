@@ -57,6 +57,10 @@ if contains(ProfileType,'gaussian')
     end
     SWPupil(:,:,2) = (NA1Weighting ./ WeightRatio) .* conv2(SWPupil(:,:,2),gaussian2,'same');
 
+    % Masks
+    SWMask(:,:,1) = ((k_NAmax(1)*2 > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(1)/2 < sqrt(kx_exc.^2 + kz_exc.^2)));
+    SWMask(:,:,2) = ((k_NAmax(2)*2 > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(2)/2 < sqrt(kx_exc.^2 + kz_exc.^2)));
+
 elseif contains(ProfileType,'tophat')
     % NA1 Pupil
     for j = 1:length(kxposition1)
@@ -70,14 +74,13 @@ elseif contains(ProfileType,'tophat')
         (N+1)/2 + round(kzposition2(j) - deltaNApixels2-20) : (N+1)/2 + round(kzposition2(j)+ deltaNApixels2+20),...
         (N+1)/2 + round(kxposition2(j)),2 ) = NA1Weighting / WeightRatio;
     end
-    
+
+    % Masks
+    SWMask(:,:,1) = ((k_NAmax(1) > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(1) < sqrt(kx_exc.^2 + kz_exc.^2)));
+    SWMask(:,:,2) = ((k_NAmax(2) > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(2) < sqrt(kx_exc.^2 + kz_exc.^2)));
 else
     error("Incorrect Intensity Profile")
 end
-
-% Masks
-SWMask(:,:,1) = ((k_NAmax(1) > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(1) < sqrt(kx_exc.^2 + kz_exc.^2)));
-SWMask(:,:,2) = ((k_NAmax(2) > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(2) < sqrt(kx_exc.^2 + kz_exc.^2)));
 
 SWPupil = SWPupil .* SWMask .* k_wave./ky_exc;
 SWPupil(SWPupil == inf) = 0;

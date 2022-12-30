@@ -5,17 +5,17 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
     % Unaberrated
     [LatticePSF,LatticePSFDithered] = SimulateLattice(LatticePupil);
     UnaberratedxzPSF = LatticePSF(:,:,(N+1)/2); UnaberratedxzPSF = UnaberratedxzPSF/max(max(UnaberratedxzPSF));
-    UnaberratedzPSF = UnaberratedxzPSF(:,(N+1)/2); UnaberratedzPSF = UnaberratedzPSF/max(UnaberratedzPSF);
+    UnaberratedzPSF = UnaberratedxzPSF(:,(N+1)/2); 
     UnaberratedxzOTF = abs(fftshift(fft2(UnaberratedxzPSF))); UnaberratedxzOTF = UnaberratedxzOTF/max(max(UnaberratedxzOTF));
-    UnaberratedzOTF = UnaberratedxzOTF(:,(N+1)/2); UnaberratedzOTF = UnaberratedzOTF/max(UnaberratedzOTF);
+    UnaberratedzOTF = UnaberratedxzOTF(:,(N+1)/2); 
     UnaberratedyzPSF = squeeze(LatticePSF(:,(N+1)/2,:)); UnaberratedyzPSF = UnaberratedyzPSF/max(max(UnaberratedyzPSF));
-    UnaberratedyPSF = UnaberratedyzPSF((N+1)/2,:); UnaberratedyPSF = UnaberratedyPSF/max(UnaberratedyPSF);
+    UnaberratedyPSF = UnaberratedyzPSF((N+1)/2,:);
     
     % Overall Unaberrated 
     UnaberratedOverallxzPSF = getOverallPSF(LatticePSFDithered(:,:,(N+1)/2)); UnaberratedOverallxzPSF = UnaberratedOverallxzPSF/max(max(UnaberratedOverallxzPSF));
-    UnaberratedOverallzPSF = UnaberratedOverallxzPSF(:,(N+1)/2); UnaberratedOverallzPSF = UnaberratedOverallzPSF/max(UnaberratedOverallzPSF);
+    UnaberratedOverallzPSF = UnaberratedOverallxzPSF(:,(N+1)/2); 
     UnaberratedOverallxzOTF = abs(fftshift(fft2(UnaberratedOverallxzPSF))); UnaberratedOverallxzOTF = UnaberratedOverallxzOTF/max(max(UnaberratedOverallxzOTF));
-    UnaberratedOverallzOTF = UnaberratedOverallxzOTF(:,(N+1)/2); UnaberratedOverallzOTF = UnaberratedOverallzOTF/max(UnaberratedOverallzOTF);
+    UnaberratedOverallzOTF = UnaberratedOverallxzOTF(:,(N+1)/2); 
 
     [theta,r] = cart2pol(kx_exc./(0.6./n*k_wave),kz_exc./(0.6./n*k_wave));
     idx = r<=1;
@@ -77,17 +77,17 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
             AberratedLatticePSFDithered = AberratedLatticePSFDithered/max(max(max(AberratedLatticePSFDithered)));
 
             xzPSF = AberratedLatticePSF(:,:,(N+1)/2); xzPSF = xzPSF/max(max(xzPSF));
-            zPSF = xzPSF(:,(N+1)/2); zPSF = zPSF/max(zPSF);
+            zPSF = xzPSF(:,(N+1)/2); 
             xzOTF = abs(fftshift(fft2(xzPSF))); xzOTF = xzOTF/max(max(xzOTF));
-            zOTF = xzOTF(:,(N+1)/2); zOTF = zOTF/max(zOTF);
+            zOTF = xzOTF(:,(N+1)/2); 
             yzPSF = squeeze(AberratedLatticePSF(:,(N+1)/2,:)); yzPSF = yzPSF/max(max(yzPSF));
-            yPSF = yzPSF((N+1)/2,:); yPSF = yPSF/max(yPSF);
+            yPSF = yzPSF((N+1)/2,:); 
 
             % Calculate Overall PSF and OTF
             OverallxzPSF = getOverallPSF(AberratedLatticePSFDithered(:,:,(N+1)/2)); OverallxzPSF = OverallxzPSF/max(max(OverallxzPSF));
-            OverallzPSF = OverallxzPSF(:,(N+1)/2); OverallzPSF = OverallzPSF/max(OverallzPSF);
+            OverallzPSF = OverallxzPSF(:,(N+1)/2); 
             OverallxzOTF = abs(fftshift(fft2(OverallxzPSF))); OverallxzOTF = OverallxzOTF/max(max(OverallxzOTF));
-            OverallzOTF = OverallxzOTF(:,(N+1)/2); OverallzOTF = OverallzOTF/max(OverallzOTF);
+            OverallzOTF = OverallxzOTF(:,(N+1)/2); 
 
             index = find(yPSF((N+1)/2:end) <= 0.5);
             if ~isempty(index)
@@ -220,17 +220,17 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
 
                 xzPSF_exc = AberratedLatticePSF(:,:,jj); xzPSF_exc = xzPSF_exc/max(max(xzPSF_exc));
                 xzPSF_exc_dither = AberratedLatticePSFDithered(:,:,jj); xzPSF_exc_dither = xzPSF_exc_dither/max(max(xzPSF_exc_dither));
-                zPSF_exc = xzPSF_exc(:,(N+1)/2); zPSF_exc = zPSF_exc/max(zPSF_exc);
-                zPSF_exc_dither = xzPSF_exc_dither(:,(N+1)/2); zPSF_exc_dither = zPSF_exc_dither/max(zPSF_exc_dither);
-                xzOTF_exc = fftshift(fft2(xzPSF_exc)); xzOTF_exc = xzOTF_exc/max(max(xzOTF_exc));
-                zOTF_exc = abs(xzOTF_exc(:,(N+1)/2)) / max(abs(xzOTF_exc(:,(N+1)/2)));
+                zPSF_exc = xzPSF_exc(:,(N+1)/2); 
+                zPSF_exc_dither = xzPSF_exc_dither(:,(N+1)/2); 
+                xzOTF_exc = abs(fftshift(fft2(xzPSF_exc))); xzOTF_exc = xzOTF_exc/max(max(xzOTF_exc));
+                zOTF_exc = xzOTF_exc(:,(N+1)/2);
 
                 UnaberratedxzPSF_exc = LatticePSF(:,:,jj); UnaberratedxzPSF_exc = UnaberratedxzPSF_exc/max(max(UnaberratedxzPSF_exc));
                 UnaberratedxzPSF_exc_dither = LatticePSFDithered(:,:,jj); UnaberratedxzPSF_exc_dither = UnaberratedxzPSF_exc_dither/max(max(UnaberratedxzPSF_exc_dither));
-                UnaberratedzPSF_exc = UnaberratedxzPSF_exc(:,(N+1)/2); UnaberratedzPSF_exc = UnaberratedzPSF_exc/max(UnaberratedzPSF_exc);
-                UnaberratedzPSF_exc_dither = UnaberratedxzPSF_exc_dither(:,(N+1)/2); UnaberratedzPSF_exc_dither = UnaberratedzPSF_exc_dither/max(UnaberratedzPSF_exc_dither);
-                UnaberratedxzOTF_exc = fftshift(fft2(UnaberratedxzPSF_exc)); UnaberratedxzOTF_exc = UnaberratedxzOTF_exc/max(max(UnaberratedxzOTF_exc));
-                UnaberratedzOTF_exc = abs(UnaberratedxzOTF_exc(:,(N+1)/2)) / max(abs(UnaberratedxzOTF_exc(:,(N+1)/2)));
+                UnaberratedzPSF_exc = UnaberratedxzPSF_exc(:,(N+1)/2); 
+                UnaberratedzPSF_exc_dither = UnaberratedxzPSF_exc_dither(:,(N+1)/2); 
+                UnaberratedxzOTF_exc = abs(fftshift(fft2(UnaberratedxzPSF_exc))); UnaberratedxzOTF_exc = UnaberratedxzOTF_exc/max(max(UnaberratedxzOTF_exc));
+                UnaberratedzOTF_exc = UnaberratedxzOTF_exc(:,(N+1)/2);
 
                 h1_Unaberrated = subplot(3,3,1,'Parent',fig11);
                 h1_image_unaberrated = imagesc(h1_Unaberrated,X_exc,Z_exc,UnaberratedxzPSF_exc);
@@ -345,7 +345,7 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
                 h3_Unaberrated = subplot(3,3,7,'Parent',fig11);
                 h3_image_unaberrated = imagesc(h3_Unaberrated,KX_exc,...
                           KZ_exc,...
-                         abs(UnaberratedxzOTF_exc)) ;
+                         UnaberratedxzOTF_exc) ;
                 title("XZ-Excitation OTF")
                 h3_Unaberrated.Title.FontSize = 5;
                 xlabel("k_x/(4\pin/\lambda_{exc})")
@@ -362,7 +362,7 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
                 h3 = subplot(3,3,8,'Parent',fig11);
                 h3_image = imagesc(h3,KX_exc,...
                           KZ_exc,...
-                         abs(xzOTF_exc)) ;
+                         xzOTF_exc) ;
                 title("Aberrated XZ-Excitation OTF")
                 h3.Title.FontSize = 5;
                 xlabel("k_x/(4\pin/\lambda_{exc})")

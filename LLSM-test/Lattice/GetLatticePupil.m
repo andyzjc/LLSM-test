@@ -37,6 +37,7 @@ if contains(ProfileType,'gaussian')
     end
     LatticePupil = conv2(LatticePupil,gaussian,'same');
 
+    LatticeMask = ((k_NAmax*2 > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin/2 < sqrt(kx_exc.^2 + kz_exc.^2)));
 elseif contains(ProfileType,'tophat')
     
     for j = 1:length(kxposition)
@@ -45,12 +46,12 @@ elseif contains(ProfileType,'tophat')
         (N+1)/2 + round(kxposition(j)) ) = Weighting;
     end
 
+    LatticeMask = ((k_NAmax > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin < sqrt(kx_exc.^2 + kz_exc.^2)));
 else
     error("Incorrect Intensity Profile")
 end
 
 % Masks
-LatticeMask = ((k_NAmax > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin < sqrt(kx_exc.^2 + kz_exc.^2)));
 
 LatticePupil = LatticePupil .* LatticeMask .* k_wave./ky_exc;
 LatticePupil(LatticePupil == inf) = 0;
