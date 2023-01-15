@@ -80,9 +80,9 @@ Pupils = imagesc(KZ_exc,KX_exc,real(Pupil_sum));
     add_intensity_line = plot(Z_exc,PSFIncoherent(:,(N+1)/2,(N+1)/2));
         add_intensity_line.Color = 'r';
         add_intensity_line.LineWidth = 3;
-    add_pupil_line = plot(Z_exc,PSFCoherent(:,(N+1)/2,(N+1)/2));
-        add_pupil_line.Color = 'g';
-        add_pupil_line.LineWidth = 3;
+%     add_pupil_line = plot(Z_exc,PSFCoherent(:,(N+1)/2,(N+1)/2));
+%         add_pupil_line.Color = 'g';
+%         add_pupil_line.LineWidth = 3;
     title("Focal Plane Profile,X=0,Y=0")
     xlabel("z(\lambda_{exc}/n)")
     ylabel("Normalized Intensity")
@@ -124,9 +124,9 @@ image19 = imagesc( KX_exc,...
 incoherent = plot( KZ_exc, incoherent_OTF(:,(N+1)/2));
     incoherent.LineWidth = 3;
     incoherent.Color = 'r';
-coherent = plot( KZ_exc, coherent_OTF(:,(N+1)/2));
-    coherent.LineWidth = 2;
-    coherent.Color = 'g';
+% coherent = plot( KZ_exc, coherent_OTF(:,(N+1)/2));
+%     coherent.LineWidth = 2;
+%     coherent.Color = 'g';
     title("Z-OTF Profile, " + "K_X=0, " + "K_Y=0")
     ylabel("Normalized a.u. ")
     xlabel("k_z/(4\pin/\lambda_{exc})")
@@ -171,9 +171,9 @@ coherent = plot( KZ_exc, coherent_OTF(:,(N+1)/2));
     add_intensity_line_yz = plot(Y_exc, squeeze(PSFIncoherent((N+1)/2,(N+1)/2,:)) );
         add_intensity_line_yz.Color = 'r';
         add_intensity_line_yz.LineWidth = 3;
-    add_pupil_line_yz = plot(Y_exc, squeeze(PSFCoherent((N+1)/2,(N+1)/2,:)) );
-        add_pupil_line_yz.Color = 'g';
-        add_pupil_line_yz.LineWidth = 3;
+%     add_pupil_line_yz = plot(Y_exc, squeeze(PSFCoherent((N+1)/2,(N+1)/2,:)) );
+%         add_pupil_line_yz.Color = 'g';
+%         add_pupil_line_yz.LineWidth = 3;
     title("Z=0,X=0,Incoherent yFWHM=" + num2str(yFWHM) + "/lambda")
     xlabel("y(\lambda_{exc}/n)")
     ylabel("Normalized Intensity")
