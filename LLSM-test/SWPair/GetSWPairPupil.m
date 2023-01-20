@@ -1,7 +1,7 @@
 function [SWPupil,SWMask,SWPupilMeta] = GetSWPairPupil(ProfileType,...
                                   NA1Ideal,NA2Ideal,...
                                   deltaNA1,deltaNA2,...
-                                  NA1Weighting,WeightRatio)
+                                  WeightRatio)
     % generates a pair SW pupil functions 
     % ProfileType = 'gaussian','tophat'
     % WeightRatio = I(NA1)/I(NA2)
@@ -40,7 +40,7 @@ if contains(ProfileType,'gaussian')
             (N+1)/2 + round(kzposition1(j)),...
             (N+1)/2 + round(kxposition1(j)),1) = 1;
     end
-    SWPupil(:,:,1) = NA1Weighting .* conv2(SWPupil(:,:,1),gaussian1,'same');
+    SWPupil(:,:,1) = 1 .* conv2(SWPupil(:,:,1),gaussian1,'same');
 
     % NA2 Pupil
     if NAmin(2) > 0
@@ -55,7 +55,7 @@ if contains(ProfileType,'gaussian')
         gaussian2 = exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA(2)).^2) );
         SWPupil( (N+1)/2,(N+1)/2, 2) = 1;
     end
-    SWPupil(:,:,2) = (NA1Weighting ./ WeightRatio) .* conv2(SWPupil(:,:,2),gaussian2,'same');
+    SWPupil(:,:,2) = (1 ./ WeightRatio) .* conv2(SWPupil(:,:,2),gaussian2,'same');
 
     % Masks
     SWMask(:,:,1) = ((k_NAmax(1)*2 > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(1)/2 < sqrt(kx_exc.^2 + kz_exc.^2)));
@@ -94,6 +94,5 @@ SWPupilMeta.NA1max = NAmax(1);
 SWPupilMeta.NA2max = NAmax(2);
 SWPupilMeta.NA1min = NAmin(1);
 SWPupilMeta.NA2min = NAmin(2);
-SWPupilMeta.NA1Weighting = NA1Weighting;
 SWPupilMeta.WeightingRatio = WeightRatio;
 

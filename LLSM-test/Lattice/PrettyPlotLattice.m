@@ -4,9 +4,12 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     CalculatePhysics;
     NAmax = LatticeMetaData.NAmax;
     NAmin = LatticeMetaData.NAmin;
+    MaskNAmax = LatticeMetaData.MaskNAmax;
+    MaskNAmin = LatticeMetaData.MaskNAmin;
 
     fig1 = figure;
-    fig1.Name = "Rear Pupil";
+    fig1.Name = "Rear Pupil," + "NAmax = " + num2str(NAmax) +...
+                  ", NAmin = " + num2str(NAmin); 
     colormap(hot(256))
     
     subplot(1,2,1);
@@ -25,8 +28,8 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     image15 = imagesc( KX_exc, KZ_exc,...
                   Illum_mask);
     title("Masking, " +...
-          "NA_{max} = " + num2str(NAmax) +...
-          ", NA_{min} = " + num2str(NAmin) )
+          "NA_{max} = " + num2str(MaskNAmax) +...
+          ", NA_{min} = " + num2str(MaskNAmin) )
     xlabel("k_x/(4\pin/\lambda_{exc})")
     ylabel("k_z/(4\pin/\lambda_{exc})")
     axis image
@@ -137,13 +140,12 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     
     subplot(2,4,8)
     zOTF_exc_dither = abs(xzOTF_exc_dither(:,(N+1)/2));
-    image112 = plot( KZ_exc, zOTF_exc_dither);
+    image112 = plot( KZ_exc, zOTF_exc_dither/max(max(zOTF_exc_dither)));
     title("Dithered Z-Excitation-OTF, " + "K_X=0, " + "K_Y=0")
     ylabel("Normalized a.u. ")
     xlabel("k_z/(4\pin/\lambda_{exc})")
     image112.LineWidth = 2;
     image112.Color = 'r';
-    image112.Parent.XLim = [-1,1];
     image112.Parent.YAxis.TickValues = linspace(0,1,11);
     image112.Parent.XAxis.TickValues = linspace(-0.5,0.5,11);
     image112.Parent.XLim = [-0.5,0.5];

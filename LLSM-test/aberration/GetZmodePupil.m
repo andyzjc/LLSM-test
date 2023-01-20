@@ -4,19 +4,19 @@ function GetZmodePupil(MaxRadialOrder)
     
     [theta,r] = cart2pol(kx_exc./(0.6./n*k_wave),kz_exc./(0.6./n*k_wave));
     idx = r<=1;
-    z = nan(size(kx_exc));
+    phase = zeros(size(kx_exc));
 
     fig1 = figure('Units','normalized');
-    for i = 0:MaxRadialOrder
+    MinRadialOrder = 0;
+    for i = MinRadialOrder:MaxRadialOrder
         RadialOrder = i*ones(1,i+1);
         AngularFrequency = -i:2:i;
-        y = zernfun(RadialOrder,AngularFrequency,r(idx),theta(idx),'norm');
-
         AngularFrequency_iteration = 1:1:length(AngularFrequency);
-        for k = 1:length(RadialOrder)
-            z(idx) = y(:,k);
-            subplot(MaxRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*i)+AngularFrequency_iteration(k),'Parent',fig1)
-            pcolor(KX_exc,KZ_exc,z), shading interp
+
+        for k = 1:length(AngularFrequency)
+            phase(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx),'norm');
+            subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig1)
+            pcolor(KX_exc,KZ_exc,phase), shading interp
             set(gca,'XTick',[],'YTick',[])
             axis square
             colorbar

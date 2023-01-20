@@ -12,9 +12,9 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
     UnaberratedyPSF = UnaberratedyzPSF((N+1)/2,:);
     
     % Overall Unaberrated 
-    UnaberratedOverallxzPSF = getOverallPSF(LatticePSFDithered(:,:,(N+1)/2)); UnaberratedOverallxzPSF = UnaberratedOverallxzPSF/max(max(UnaberratedOverallxzPSF));
+    UnaberratedOverallxzPSF = getOverallPSF(UnaberratedxzPSF); UnaberratedOverallxzPSF = UnaberratedOverallxzPSF/max(max(UnaberratedOverallxzPSF));
     UnaberratedOverallzPSF = UnaberratedOverallxzPSF(:,(N+1)/2); 
-    UnaberratedOverallxzOTF = abs(fftshift(fft2(UnaberratedOverallxzPSF))); UnaberratedOverallxzOTF = UnaberratedOverallxzOTF/max(max(UnaberratedOverallxzOTF));
+    UnaberratedOverallxzOTF = getOverallOTF(UnaberratedxzOTF); UnaberratedOverallxzOTF = UnaberratedOverallxzOTF/max(max(UnaberratedOverallxzOTF));
     UnaberratedOverallzOTF = UnaberratedOverallxzOTF(:,(N+1)/2); 
 
     [theta,r] = cart2pol(kx_exc./(0.6./n*k_wave),kz_exc./(0.6./n*k_wave));
@@ -87,9 +87,9 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
             yPSF = yzPSF((N+1)/2,:); 
 
             % Calculate Overall PSF and OTF
-            OverallxzPSF = getOverallPSF(AberratedLatticePSFDithered(:,:,(N+1)/2)); OverallxzPSF = OverallxzPSF/max(max(OverallxzPSF));
+            OverallxzPSF = getOverallPSF(xzPSF); OverallxzPSF = OverallxzPSF/max(max(OverallxzPSF));
             OverallzPSF = OverallxzPSF(:,(N+1)/2); 
-            OverallxzOTF = abs(fftshift(fft2(OverallxzPSF))); OverallxzOTF = OverallxzOTF/max(max(OverallxzOTF));
+            OverallxzOTF = getOverallOTF(xzOTF); OverallxzOTF = OverallxzOTF/max(max(OverallxzOTF));
             OverallzOTF = OverallxzOTF(:,(N+1)/2); 
 
             index = find(yPSF((N+1)/2:end) <= 0.5);
