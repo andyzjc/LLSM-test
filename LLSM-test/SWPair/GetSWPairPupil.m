@@ -66,13 +66,13 @@ elseif contains(ProfileType,'tophat')
     for j = 1:length(kxposition1)
     SWPupil( ...
         (N+1)/2 + round(kzposition1(j) - deltaNApixels1-20) : (N+1)/2 + round(kzposition1(j)+ deltaNApixels1+20),...
-        (N+1)/2 + round(kxposition1(j)),1 ) = NA1Weighting;
+        (N+1)/2 + round(kxposition1(j)),1 ) = 1;
     end
     % NA2 Pupil
     for j = 1:length(kxposition2)
     SWPupil( ...
         (N+1)/2 + round(kzposition2(j) - deltaNApixels2-20) : (N+1)/2 + round(kzposition2(j)+ deltaNApixels2+20),...
-        (N+1)/2 + round(kxposition2(j)),2 ) = NA1Weighting / WeightRatio;
+        (N+1)/2 + round(kxposition2(j)),2 ) = 1 / WeightRatio;
     end
 
     % Masks
