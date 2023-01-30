@@ -3,9 +3,12 @@ function [LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil(LatticeTyp
     % LatticeType = 'hex','square'
     % ProfileType = 'gaussian','tophat'
 if contains(LatticeType,'hex')
-    theta = [30,90,150,210,270,330];
+     theta = [30,90,150,210,270,330];
+%      theta = [30,150,210,330];
 elseif contains(LatticeType,'square')
-    theta = [0,90,180,270];
+     theta = [0,90,180,270];
+%      theta = [0,180];
+%               theta = [90, 270];
 else
     error("Incorrect Lattice type")
 end
@@ -16,7 +19,7 @@ CalculatePhysics;
 NAmax = NAIdeal + deltaNA/2;
 NAmin = NAIdeal - deltaNA/2;
 k_ideal = k_wave * NAIdeal / n;
-k_deltaNA = deltaNA ./ n * k_wave;
+k_deltaNA = deltaNA / n * k_wave;
 k_NAmax = NAmax /n * k_wave; % k
 k_NAmin = NAmin /n * k_wave; 
 k_MaskNAmax = MaskNAmax /n * k_wave; % k
@@ -29,7 +32,7 @@ deltaNApixels = k_deltaNA / deltak;
 LatticePupil = zeros(N,N);
 if contains(ProfileType,'gaussian')
 
-    gaussian_SW = 1 .* exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA/2).^2) );
+    gaussian_SW = 1 .* exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA).^2) );
     for j = 1:length(kxposition)
         if theta(j) == 90 || theta(j) == 270
             LatticePupil( ...
@@ -41,11 +44,11 @@ if contains(ProfileType,'gaussian')
 
     LatticePupil = zeros(N,N);
     if contains(LatticeType,'hex')
-        gaussian_lattice = (1 ./ WeightingRatio) .* exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA).^2) );
+        gaussian_lattice = (1 ./ WeightingRatio) .* exp( -(kz_exc(:,1).^2)/ ( (2*k_deltaNA).^2) );
     else
         deltaNA_Square = sqrt(2*deltaNA*NAIdeal);
         k_deltaNA_Square = deltaNA_Square ./ n * k_wave;
-        gaussian_lattice = (1 ./ WeightingRatio) .* exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA_Square/2).^2) );
+        gaussian_lattice = (1 ./ WeightingRatio) .* exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA_Square).^2) );
     end
 
     for j = 1:length(kxposition)
@@ -63,7 +66,7 @@ elseif contains(ProfileType,'tophat')
     for j = 1:length(kxposition)
         if theta(j) == 90 || theta(j) == 270
         LatticePupil( ...
-            (N+1)/2 + round(kzposition(j) - deltaNApixels/2) : (N+1)/2 + round(kzposition(j)+ deltaNApixels/2),...
+            (N+1)/2 + round(kzposition(j) - deltaNApixels) : (N+1)/2 + round(kzposition(j)+ deltaNApixels),...
             (N+1)/2 + round(kxposition(j)) ) = 1;
         end
     end
@@ -77,20 +80,19 @@ elseif contains(ProfileType,'tophat')
     for j = 1:length(kxposition)
         if theta(j) ~= 90 && theta(j) ~= 270
         LatticePupil( ...
-            (N+1)/2 + round(kzposition(j) - deltaNApixels) : (N+1)/2 + round(kzposition(j)+ deltaNApixels),...
+            (N+1)/2 + round(kzposition(j) - deltaNApixels-20) : (N+1)/2 + round(kzposition(j)+ deltaNApixels+20),...
             (N+1)/2 + round(kxposition(j)) ) = (1 ./ WeightingRatio);
         end
     end
-
     ShapePupil = ((k_NAmax >= sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin <= sqrt(kx_exc.^2 + kz_exc.^2)));
-    LatticePupil = LatticePupil.* ShapePupil;
+    LatticePupil = LatticePupil .* ShapePupil;
+
 else
     error("Incorrect Intensity Profile")
 end
 
-ShapePupil = ((k_NAmax >= sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin <= sqrt(kx_exc.^2 + kz_exc.^2)));
-LatticeMask = ((k_MaskNAmax > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_MaskNAmin < sqrt(kx_exc.^2 + kz_exc.^2)));
-LatticePupil = LatticePupil .* LatticeMask .* k_wave./ky_exc;
+LatticeMask = ((k_MaskNAmax >= sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_MaskNAmin <= sqrt(kx_exc.^2 + kz_exc.^2)));
+LatticePupil =  LatticePupil .* LatticeMask;
 LatticePupil(LatticePupil == inf) = 0;
 LatticePupil = fillmissing(LatticePupil,'constant',0);
 

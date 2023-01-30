@@ -157,9 +157,9 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     colormap(hot(256)) 
     
     subplot(2,4,1:2);
-    yzPSF_exc = squeeze(LatticePSF(:,(N+1)/2,(N+1)/2:end));
+    yzPSF_exc = squeeze(LatticePSF(:,(N+1)/2,:));
     yzPSF_exc = yzPSF_exc/max(max(yzPSF_exc));
-    image24 = imagesc(Y_exc((N+1)/2:end), Z_exc, yzPSF_exc);
+    image24 = imagesc(Y_exc, Z_exc, yzPSF_exc);
     title("YZ-Excitation-PSF, " + "X = 0" )
     axis image
     xlabel("y/(\lambda_{exc}/n)")
@@ -168,8 +168,8 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     colorbar
     
     subplot(2,4,5:6);
-    yzPSF_exc_dither = squeeze(LatticePSFDithered(:,(N+1)/2,(N+1)/2:end));
-    image25 = imagesc(Y_exc((N+1)/2:end),Z_exc, yzPSF_exc_dither );
+    yzPSF_exc_dither = squeeze(LatticePSFDithered(:,(N+1)/2,:));
+    image25 = imagesc(Y_exc,Z_exc, yzPSF_exc_dither );
     title("Dithered YZ-Excitation-PSF, " + "X = 0" )
     xlabel("y/(\lambda_{exc}/n)")
     ylabel("z/(\lambda_{exc}/n)")
@@ -186,8 +186,8 @@ function PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,L
     yPSF_exc_dither = yPSF_exc_dither/max(yPSF_exc_dither);
     
     % Calculate yFWHM
-    index = find(yPSF_exc((N+1)/2:end) <= 0.5);
-    index_dither = find(yPSF_exc_dither((N+1)/2:end) <= 0.5);
+    index = find(yPSF_exc((N+1)/2:end) < 0.5);
+    index_dither = find(yPSF_exc_dither((N+1)/2:end) < 0.5);
     if ~isempty(index)
         yFWHM = 2*Y_exc((N+1)/2+index(1)-1);
     else

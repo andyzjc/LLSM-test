@@ -139,7 +139,7 @@ incoherent = plot( KZ_exc, incoherent_OTF(:,(N+1)/2));
     hold off
 
     subplot(3,3,7)
-    add_intensityyz = imagesc(Y_exc((N+1)/2:end),Z_exc,squeeze(PSFIncoherent(:,(N+1)/2,(N+1)/2:end)));
+    add_intensityyz = imagesc(Y_exc,Z_exc,squeeze(PSFIncoherent(:,(N+1)/2,:)));
     title("Incoherent")
     xlabel("y(\lambda_{exc}/n)")
     ylabel("z(\lambda_{exc}/n)")
@@ -148,7 +148,7 @@ incoherent = plot( KZ_exc, incoherent_OTF(:,(N+1)/2));
     add_intensityyz.Parent.YLim = [-40,40];
 
     subplot(3,3,8)
-    add_pupilyz = imagesc(Y_exc((N+1)/2:end),Z_exc,squeeze(PSFCoherent(:,(N+1)/2,(N+1)/2:end)));
+    add_pupilyz = imagesc(Y_exc,Z_exc,squeeze(PSFCoherent(:,(N+1)/2,:)));
     title("Coherent")
     xlabel("y(\lambda_{exc}/n)")
     ylabel("z(\lambda_{exc}/n)")
@@ -178,7 +178,7 @@ incoherent = plot( KZ_exc, incoherent_OTF(:,(N+1)/2));
     xlabel("y(\lambda_{exc}/n)")
     ylabel("Normalized Intensity")
     legend("Incoherent","Coherent")
-    xlim([0,150])
+    xlim([-150,150])
     grid on
     axis square
 
