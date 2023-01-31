@@ -2,6 +2,8 @@ function fc2 = FC2(Image1,Image2)
     getParameters; %modify image parameter here
     CalculatePhysics;
 
+    N=size(Image1,1);
+
     % fourier transform 
     FTimage1 = fftshift(fft2(Image1));
     FTimage2 = fftshift(fft2(Image2));
@@ -24,43 +26,44 @@ function fc2 = FC2(Image1,Image2)
     denominator1 = (one(:,:,2) + two(:,:,2) + three(:,:,2)+ four(:,:,2))./4;
     denominator2 = (one(:,:,3) + two(:,:,3) + three(:,:,3)+ four(:,:,3))./4;
 
-    % filter out some noise (maybe)
-    numerator(numerator <= 10^-10) = 0;
-    denominator1(denominator1 <= 10^-10) = 0;
-    denominator2(denominator2 <= 10^-10) = 0;
+    numerator(abs(numerator)<10^-30) = 0;
+    denominator1(abs(denominator1)<10^-30) = 0;
+    denominator2(abs(denominator2)<10^-30) = 0;
 
     % calculate fourier correlation
-    fc2 = abs(numerator) ./ (sqrt(abs(denominator1).*abs(denominator2)));
+    fc2 = real(numerator) ./ (sqrt(denominator1.*denominator2));
     fc2 = fc2/max(max(fc2));
 
-    % plot
-    figure
-    subplot(2,2,1)
-    imagesc(Image1)
+%     plot
+%     figure
+%     subplot(2,2,1)
+%     imagesc(Image1)
 %     title("SNR=1000")
-    axis image
-
-    subplot(2,2,2)
-    imagesc(Image2)
+%     axis image
+%     colorbar
+% 
+%     subplot(2,2,2)
+%     imagesc(Image2)
 %     title("SNR=10")
-    axis image
-
-    h1 = subplot(2,2,3);
-    imagesc(KX_exc((N+1)/2:N),flip(KZ_exc((N+1)/2:N)),fc2)
-    xlabel("k_x/(4\pin/\lambda_{exc})")
-    ylabel("k_z/(4\pin/\lambda_{exc})")
-    colormap(hot)
-    colorbar
-    set(h1, 'YDir','normal')
-    axis image
-
-    h2 = subplot(2,2,4);
-    fc2contour = zeros(size(fc2));
-    fc2contour(fc2>=1/7) = 1;
-    imagesc(KX_exc((N+1)/2:N),flip(KZ_exc((N+1)/2:N)),fc2contour)
-    xlabel("k_x/(4\pin/\lambda_{exc})")
-    ylabel("k_z/(4\pin/\lambda_{exc})")
-    set(h2, 'YDir','normal')
-    colormap(hot)
-    colorbar
-    axis image
+%     axis image
+%     colorbar
+% 
+%     h1 = subplot(2,2,3);
+%     imagesc(KX_exc((N+1)/2:N),flip(KZ_exc((N+1)/2:N)),fc2)
+%     xlabel("k_x/(4\pin/\lambda_{exc})")
+%     ylabel("k_z/(4\pin/\lambda_{exc})")
+%     colormap(hot)
+%     colorbar
+%     set(h1, 'YDir','normal')
+%     axis image
+% 
+%     h2 = subplot(2,2,4);
+%     fc2contour = zeros(size(fc2));
+%     fc2contour(fc2>=1/7) = 1;
+%     imagesc(KX_exc((N+1)/2:N),flip(KZ_exc((N+1)/2:N)),fc2contour)
+%     xlabel("k_x/(4\pin/\lambda_{exc})")
+%     ylabel("k_z/(4\pin/\lambda_{exc})")
+%     set(h2, 'YDir','normal')
+%     colormap(hot)
+%     colorbar
+%     axis image
