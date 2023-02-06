@@ -41,7 +41,7 @@ function ScaledPSFdet = getDetectionPSF
     
     for i = 1:length(z_det)
         propagator_det = exp( 2*pi * 1i * kz_det * z_det(i));
-        PSFdet(:,:,i) = abs( fftshift( ifft2(Pupil.* propagator_det) ) ).^2;
+        PSFdet(:,:,i) = abs( fftshift( ifft2(ifftshift(Pupil.* propagator_det)) ) ).^2;
     end 
     PSFdet = PSFdet/max(max(max(PSFdet))); 
     

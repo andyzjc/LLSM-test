@@ -1,4 +1,4 @@
-function [LatticePSF,LatticePSFDithered] = SimulateLattice(LatticePupil)
+function [LatticePSF,LatticePSFDithered,center] = SimulateLattice(LatticePupil)
 
 getParameters;
 CalculatePhysics;
@@ -9,11 +9,11 @@ LatticePSFDithered = zeros(N,N, N);
 % propagation
 for i = 1:length(y_exc)
     propagator_exc = exp(2*pi * 1i * ky_exc * y_exc(i));
-    LatticePSF(:,:,i) = abs( fftshift( ifft2(LatticePupil .* propagator_exc) ) ).^2;
-
+    LatticePSF(:,:,i) = abs( fftshift( ifft2(ifftshift(LatticePupil .* propagator_exc)) ) ).^2;
     LatticePSFDithered(:,:,i) = meshgrid(mean(LatticePSF(:,:,i),2))';
 end  
 
-% Normalize
-LatticePSF = LatticePSF/max(max(max(LatticePSF)));
-LatticePSFDithered = LatticePSFDithered/max(max(max(LatticePSFDithered)));
+% find maximum 
+[center(1,1),center(1,2)] = max(LatticePSF,[],'all'); % value,  index
+[center(2,1),center(2,2)] = max(LatticePSFDithered,[],'all'); % value, index
+

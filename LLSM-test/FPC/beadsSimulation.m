@@ -1,6 +1,6 @@
 function [Image1,Image2] = beadsSimulation(PSFexc,PSFdet,SNR)
     % Generate random beads and convolve with overallPSF(y)
-%      GTallbeads = importdata("GTbeads,rho=0.001.mat");
+%     GTallbeads = importdata("GTbeads_rho_0.005.mat");
 
     getParameters; %modify image parameter here
     CalculatePhysics;
@@ -15,7 +15,7 @@ function [Image1,Image2] = beadsSimulation(PSFexc,PSFdet,SNR)
 
     % determine random beads image size and generate random beads
     beadsStep = round(N/length(Yindex))-1;
-    beadPercent = 0.01;
+    beadPercent = 0.005;
     beads = rand(length(startindex:step:endindex)*beadsStep,length(startindex:step:endindex)*beadsStep);
     beads(beads>beadPercent)=0;
     beads(beads>0)=1;
@@ -52,9 +52,6 @@ function [Image1,Image2] = beadsSimulation(PSFexc,PSFdet,SNR)
     Image1 = temp + poissrnd(temp) * 1/SNR;
     Image2 = temp + poissrnd(temp) * 1/SNR;
 
-    Image1 = Image1/max(max(Image1));
-    Image2 = Image2/max(max(Image2));
-
     % apply a hamming window 
     hmwindow = hamming(N)*hamming(N)';
     Image1 = Image1.*hmwindow;
@@ -62,3 +59,6 @@ function [Image1,Image2] = beadsSimulation(PSFexc,PSFdet,SNR)
 
     Image1(Image1<0) = 0;
     Image2(Image2<0) = 0;
+
+%     Image1 = Image1/max(Image1,[],'all');
+%     Image2 = Image2/max(Image2,[],'all');

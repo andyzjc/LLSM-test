@@ -2,11 +2,9 @@ function fc2 = FC2(Image1,Image2)
     getParameters; %modify image parameter here
     CalculatePhysics;
 
-    N=size(Image1,1);
-
     % fourier transform 
-    FTimage1 = fftshift(fft2(Image1));
-    FTimage2 = fftshift(fft2(Image2));
+    FTimage1 = fftshift(fft2(ifftshift(Image1)));
+    FTimage2 = fftshift(fft2(ifftshift(Image2)));
 
     % Fourier ring correlation formula 
     frc(:,:,1) = FTimage1 .* conj(FTimage2);

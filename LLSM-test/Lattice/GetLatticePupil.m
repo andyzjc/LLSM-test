@@ -8,7 +8,7 @@ if contains(LatticeType,'hex')
 %        theta = [90, 270];
 elseif contains(LatticeType,'square')
      theta = [0,90,180,270];
-%        theta = [0,180];
+%         theta = [0,180];
 %        theta = [90, 270];
 else
     error("Incorrect Lattice type")

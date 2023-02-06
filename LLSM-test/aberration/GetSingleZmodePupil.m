@@ -1,4 +1,4 @@
-function Phase = GetSingleZmodePupil(RadialOrder,AngularFrequency,PhaseAmplitude)
+function Phase_factor = GetSingleZmodePupil(RadialOrder,AngularFrequency,PhaseAmplitude)
     getParameters; %modify image parameter here
     CalculatePhysics;
     
@@ -6,4 +6,5 @@ function Phase = GetSingleZmodePupil(RadialOrder,AngularFrequency,PhaseAmplitude
     idx = r<=1;
     Phase = zeros(size(kx_exc));
     Phase(idx) = zernfun(RadialOrder,AngularFrequency,r(idx),theta(idx),'norm');
-    Phase(idx) = exp(PhaseAmplitude .* 1i .* pi .* Phase(idx));
+    Phase(idx) = PhaseAmplitude .* Phase(idx);
+    Phase_factor = exp(1i .* Phase );

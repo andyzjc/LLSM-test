@@ -1,6 +1,5 @@
-function PrettyPlotSWPair(SWPupil,SWMask,SWPupilMeta,PSFCoherent,PSFIncoherent)
+function PrettyPlotSWPair(SWPupil,SWMask,SWPupilMeta,PSFCoherent,PSFIncoherent,SWcenter)
     % Display Plots based on Coherent/Incoherent pair of SW propgation 
-
 getParameters;
 CalculatePhysics;
 
@@ -15,6 +14,31 @@ beam2NAmax = SWPupilMeta.NA2max;
 beam2NAmin = SWPupilMeta.NA2min;
 WeightingRatio = SWPupilMeta.WeightingRatio;
 
+[PSFcenterInt,PSFcenter] = max(PSFIncoherent,[],'all'); % value, index
+if isequal(PSFcenter,SWcenter(2,2)) && isequal(PSFcenterInt,SWcenter(2,1))
+    PSFCoherent = PSFCoherent/max(max(max(PSFCoherent)));
+    PSFIncoherent = PSFIncoherent/max(max(max(PSFIncoherent)));
+else
+    PSFCoherent = PSFCoherent/SWcenter(1,1);
+    PSFIncoherent = PSFIncoherent/SWcenter(2,1);
+end
+
+xzPSFIncoherent = PSFIncoherent(:,:,(N+1)/2);
+zPSFIncoherent = xzPSFIncoherent(:,(N+1)/2);
+yzPSFIncoherent = squeeze(PSFIncoherent(:,(N+1)/2,:));
+yPSFIncoherent = yzPSFIncoherent((N+1)/2,:);
+
+xzPSFCoherent = PSFCoherent(:,:,(N+1)/2);
+% zPSFCoherent = xzPSFCoherent(:,(N+1)/2);
+yzPSFCoherent = squeeze(PSFCoherent(:,(N+1)/2,:));
+
+xzOTFIncoherent = real(fftshift(fft2(ifftshift(xzPSFIncoherent))));
+xzOTFIncoherent = xzOTFIncoherent./max(max(xzOTFIncoherent));
+zOTFIncoherent = xzOTFIncoherent(:,(N+1)/2);
+xzOTFCoherent = real(fftshift(fft2(ifftshift(xzPSFCoherent))));
+xzOTFCoherent = xzOTFCoherent./max(max(xzOTFCoherent));
+% zOTFCoherent = xzOTFCoherent(:,(N+1)/2);
+
 
 %% Figure 1 - Rear Pupil 
     fig1 = figure;
@@ -23,11 +47,11 @@ WeightingRatio = SWPupilMeta.WeightingRatio;
     colormap(hot(256))
 
     subplot(1,2,1)
-Illum_mask1 = imfuse(real(Pupil1),A_mask1,"falsecolor","ColorChannels","green-magenta");
-Illum_mask2 = imfuse(real(Pupil2),A_mask2,"falsecolor","ColorChannels","green-magenta");
-Illum_mask = Illum_mask1 + Illum_mask2;
-image15 = imagesc( KX_exc, KZ_exc,...
-                  real(Illum_mask));
+    Illum_mask1 = imfuse(real(Pupil1),A_mask1,"falsecolor","ColorChannels","green-magenta");
+    Illum_mask2 = imfuse(real(Pupil2),A_mask2,"falsecolor","ColorChannels","green-magenta");
+    Illum_mask = Illum_mask1 + Illum_mask2;
+    image15 = imagesc( KX_exc, KZ_exc,...
+                      real(Illum_mask));
     title("beam1=" + num2str(beam1NAmax) + "/" + num2str(beam1NAmin)...
             +",beam2=" + num2str(beam2NAmax) + "/" + num2str(beam2NAmin) ) 
     xlabel("k_x/(4\pin/\lambda_{exc})")
@@ -54,9 +78,8 @@ Pupils = imagesc(KZ_exc,KX_exc,real(Pupil_sum));
     fig2.WindowState = 'maximized';
     colormap(hot(256))
 
-
     subplot(3,3,1)
-    add_intensity = imagesc(X_exc,Z_exc,PSFIncoherent(:,:,(N+1)/2));
+    add_intensity = imagesc(X_exc,Z_exc,xzPSFIncoherent);
     title("Incoherent, Y=0")
     xlabel("x/(\lambda_{exc}/n)")
     ylabel("z /(\lambda_{exc}/n)")
@@ -66,7 +89,7 @@ Pupils = imagesc(KZ_exc,KX_exc,real(Pupil_sum));
     add_intensity.Parent.YLim = [-20,20];
 
     subplot(3,3,2)
-    add_pupil = imagesc(X_exc,Z_exc,PSFCoherent(:,:,(N+1)/2));
+    add_pupil = imagesc(X_exc,Z_exc,xzPSFCoherent);
     title("Coherent, Y=0")
     xlabel("x(\lambda_{exc}/n)")
     ylabel("z(\lambda_{exc}/n)")
@@ -77,7 +100,7 @@ Pupils = imagesc(KZ_exc,KX_exc,real(Pupil_sum));
 
     subplot(3,3,3)
     hold on
-    add_intensity_line = plot(Z_exc,PSFIncoherent(:,(N+1)/2,(N+1)/2));
+    add_intensity_line = plot(Z_exc,zPSFIncoherent);
         add_intensity_line.Color = 'r';
         add_intensity_line.LineWidth = 3;
 %     add_pupil_line = plot(Z_exc,PSFCoherent(:,(N+1)/2,(N+1)/2));
@@ -87,17 +110,15 @@ Pupils = imagesc(KZ_exc,KX_exc,real(Pupil_sum));
     xlabel("z(\lambda_{exc}/n)")
     ylabel("Normalized Intensity")
     xlim([-10,10])
-    legend("Incoherent","Coherent")
+    legend("Incoherent")
     grid on
     axis square
 
     subplot(3,3,4)
-    incoherent_OTF = abs(fftshift(fft2(PSFIncoherent(:,:,(N+1)/2))));
-    incoherent_OTF = incoherent_OTF/max(max(incoherent_OTF));
 image18 = imagesc( KX_exc,...
                   KZ_exc,...
-                    incoherent_OTF) ;
-    title("Incoherent OTF, K_Y=0")
+                    xzOTFIncoherent) ;
+    title("Incoherent real(OTF), K_Y=0")
     xlabel("k_x/(4\pin/\lambda_{exc})")
     ylabel("k_z/(4\pin/\lambda_{exc})")
     colorbar;
@@ -106,12 +127,10 @@ image18 = imagesc( KX_exc,...
     image18.Parent.YLim = [-0.5,0.5];
 
     subplot(3,3,5)
-    coherent_OTF = abs(fftshift(fft2(PSFCoherent(:,:,(N+1)/2))));
-    coherent_OTF = coherent_OTF/max(max(coherent_OTF));
 image19 = imagesc( KX_exc,...
                   KZ_exc,...
-                    coherent_OTF) ;
-    title("Coherent OTF, K_Y=0")
+                    xzOTFCoherent) ;
+    title("Coherent real(OTF), K_Y=0")
     xlabel("k_x/(4\pin/\lambda_{exc})")
     ylabel("k_z/(4\pin/\lambda_{exc})")
     colorbar;
@@ -119,9 +138,9 @@ image19 = imagesc( KX_exc,...
     image19.Parent.XLim = [-0.5,0.5];
     image19.Parent.YLim = [-0.5,0.5];
 
-        subplot(3,3,6)
-        hold on
-incoherent = plot( KZ_exc, incoherent_OTF(:,(N+1)/2));
+    subplot(3,3,6)
+    hold on
+    incoherent = plot( KZ_exc, zOTFIncoherent);
     incoherent.LineWidth = 3;
     incoherent.Color = 'r';
 % coherent = plot( KZ_exc, coherent_OTF(:,(N+1)/2));
@@ -130,16 +149,17 @@ incoherent = plot( KZ_exc, incoherent_OTF(:,(N+1)/2));
     title("Z-OTF Profile, " + "K_X=0, " + "K_Y=0")
     ylabel("Normalized a.u. ")
     xlabel("k_z/(4\pin/\lambda_{exc})")
-    incoherent.Parent.YAxis.TickValues = linspace(0,1,11);
+%     incoherent.Parent.YAxis.TickValues = linspace(0,1,11);
     incoherent.Parent.XAxis.TickValues = linspace(-0.5,0.5,11);
     incoherent.Parent.XLim = [-0.5,0.5];
-    legend("Incoherent","Coherent")
+    incoherent.Parent.YLim = [-0.3,1];
+    legend("Incoherent")
     grid on
     axis square
     hold off
 
     subplot(3,3,7)
-    add_intensityyz = imagesc(Y_exc,Z_exc,squeeze(PSFIncoherent(:,(N+1)/2,:)));
+    add_intensityyz = imagesc(Y_exc,Z_exc,yzPSFIncoherent);
     title("Incoherent")
     xlabel("y(\lambda_{exc}/n)")
     ylabel("z(\lambda_{exc}/n)")
@@ -148,7 +168,7 @@ incoherent = plot( KZ_exc, incoherent_OTF(:,(N+1)/2));
     add_intensityyz.Parent.YLim = [-40,40];
 
     subplot(3,3,8)
-    add_pupilyz = imagesc(Y_exc,Z_exc,squeeze(PSFCoherent(:,(N+1)/2,:)));
+    add_pupilyz = imagesc(Y_exc,Z_exc,yzPSFCoherent);
     title("Coherent")
     xlabel("y(\lambda_{exc}/n)")
     ylabel("z(\lambda_{exc}/n)")
@@ -157,18 +177,25 @@ incoherent = plot( KZ_exc, incoherent_OTF(:,(N+1)/2));
     add_pupilyz.Parent.YLim = [-40,40];
 
     % Calculate yFWHM
-    yPSF_exc = squeeze(PSFIncoherent((N+1)/2,(N+1)/2,:));
-    yPSF_exc = yPSF_exc/max(yPSF_exc);
-    index = find(yPSF_exc((N+1)/2:end) <= 0.5);
+    [~,maxindex] = max(yPSFIncoherent);
+    index = 1-(yPSFIncoherent <= 0.5*max(yPSFIncoherent));
     if ~isempty(index)
-        yFWHM = 2*Y_exc((N+1)/2+index(1)-1);
+        yFWHM1 = Y_exc(find(index,1,'first'));
+        yFWHM2 = Y_exc(find(index,1,'last'));
+        if abs(yFWHM1) == abs(yFWHM2)
+            yFWHM = abs(yFWHM1) + abs(yFWHM2);
+        elseif abs(Y_exc(maxindex) - yFWHM1) > abs(Y_exc(maxindex) - yFWHM2)
+            yFWHM = abs(Y_exc(maxindex) - yFWHM1)*2;
+        else
+            yFWHM = abs(Y_exc(maxindex) - yFWHM2)*2;
+        end
     else
         yFWHM = "N/A";
     end
 
     subplot(3,3,9)
     hold on
-    add_intensity_line_yz = plot(Y_exc, squeeze(PSFIncoherent((N+1)/2,(N+1)/2,:)) );
+    add_intensity_line_yz = plot(Y_exc, yPSFIncoherent );
         add_intensity_line_yz.Color = 'r';
         add_intensity_line_yz.LineWidth = 3;
 %     add_pupil_line_yz = plot(Y_exc, squeeze(PSFCoherent((N+1)/2,(N+1)/2,:)) );
@@ -177,8 +204,9 @@ incoherent = plot( KZ_exc, incoherent_OTF(:,(N+1)/2));
     title("Z=0,X=0,Incoherent yFWHM=" + num2str(yFWHM) + "/lambda")
     xlabel("y(\lambda_{exc}/n)")
     ylabel("Normalized Intensity")
-    legend("Incoherent","Coherent")
+    legend("Incoherent")
     xlim([-150,150])
+    ylim([0,1])
     grid on
     axis square
 
