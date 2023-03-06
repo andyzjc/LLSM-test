@@ -1,20 +1,28 @@
-function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmplitude)
+function [CorrCoef,StrehlPeaks,StrehlCenter] = SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmplitude)
     getParameters; %modify image parameter here
     CalculatePhysics;
 
     % Unaberrated
     [LatticePSF,LatticePSFDithered,Latticecenter] = SimulateLattice(LatticePupil);
-    UnaberratedxzPSF = LatticePSFDithered(:,:,(N+1)/2); UnaberratedxzPSF = UnaberratedxzPSF/max(max(UnaberratedxzPSF));
+    LatticePSF = LatticePSF/max(LatticePSF,[],'all');
+    LatticePSFDithered = LatticePSFDithered/max(LatticePSFDithered,[],'all');
+
+    UnaberratedxzPSF = LatticePSFDithered(:,:,(N+1)/2); 
     UnaberratedzPSF = UnaberratedxzPSF(:,(N+1)/2); 
-    UnaberratedxzOTF = abs(fftshift(fft2(UnaberratedxzPSF))); UnaberratedxzOTF = UnaberratedxzOTF/max(max(UnaberratedxzOTF));
+    UnaberratedxzOTF = fftshift(fft2(ifftshift(UnaberratedxzPSF))); UnaberratedxzOTF = UnaberratedxzOTF/max(max(UnaberratedxzOTF));
     UnaberratedzOTF = UnaberratedxzOTF(:,(N+1)/2); 
-    UnaberratedyzPSF = squeeze(LatticePSFDithered(:,(N+1)/2,:)); UnaberratedyzPSF = UnaberratedyzPSF/max(max(UnaberratedyzPSF));
+    UnaberratedyzPSF = squeeze(LatticePSFDithered(:,(N+1)/2,:));
     UnaberratedyPSF = UnaberratedyzPSF((N+1)/2,:);
     
     % Overall Unaberrated 
-    UnaberratedOverallxzPSF = getOverallPSF(UnaberratedxzPSF); UnaberratedOverallxzPSF = UnaberratedOverallxzPSF/max(max(UnaberratedOverallxzPSF));
+    UnaberratedOverallPSF = LatticePSFDithered .* PSFdet;
+%     UnaberratedOverallPSF = UnaberratedOverallPSF/max(UnaberratedOverallPSF,[],'all');
+    UnaberratedOverallOTF = fftshift(fftn(ifftshift(UnaberratedOverallPSF)));
+    UnaberratedOverallOTF = UnaberratedOverallOTF/max(UnaberratedOverallOTF,[],'all');
+
+    UnaberratedOverallxzPSF = UnaberratedOverallPSF(:,:,(N+1)/2); 
     UnaberratedOverallzPSF = UnaberratedOverallxzPSF(:,(N+1)/2); 
-    UnaberratedOverallxzOTF = getOverallOTF(UnaberratedxzOTF); UnaberratedOverallxzOTF = UnaberratedOverallxzOTF/max(max(UnaberratedOverallxzOTF));
+    UnaberratedOverallxzOTF = UnaberratedOverallOTF(:,:,(N+1)/2); 
     UnaberratedOverallzOTF = UnaberratedOverallxzOTF(:,(N+1)/2); 
 
     [theta,r] = cart2pol(kx_exc./(0.6./n*k_wave),kz_exc./(0.6./n*k_wave));
@@ -54,17 +62,24 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
     fig12 = figure(12);
         fig12.Name = 'Excitation xzPSF NonDither';
         fig12.WindowState = 'maximized';
+    fig13 = figure(13);
+        fig13.Name = 'Metric';
+        fig13.WindowState = 'maximized';
 
     MinRadialOrder = 0;
+    counter = 1;
     for i = MinRadialOrder:MaxRadialOrder
         RadialOrder = i*ones(1,i+1);
         AngularFrequency = -i:2:i;
         AngularFrequency_iteration = 1:1:length(AngularFrequency);
         for k = 1:length(AngularFrequency)
+            RadioOrderArray(counter) = i;
+            AngularFrequencyArray(counter) = AngularFrequency(k);
+
             phase(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx),'norm');
 
             AberratedPupil = zeros(size(phase));
-            AberratedPupil(idx) = LatticePupil(idx) .* exp(PhaseAmplitude.* 1i .*pi .*phase(idx));
+            AberratedPupil(idx) = LatticePupil(idx) .* exp(PhaseAmplitude.* 1i .*phase(idx));
             
             AberratedLatticePSF = zeros(N,N, N);
             AberratedLatticePSFDithered = zeros(N,N, N);
@@ -72,31 +87,40 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
             % propagation
             for j = 1:length(y_exc)
                 propagator_exc = exp(2*pi * 1i * ky_exc * y_exc(j));
-                AberratedLatticePSF(:,:,j) = abs( fftshift( ifft2(AberratedPupil .* propagator_exc) ) ).^2;
+                AberratedLatticePSF(:,:,j) = abs( fftshift( ifft2(ifftshift(AberratedPupil .* propagator_exc)) ) ).^2;
                 AberratedLatticePSFDithered(:,:,j) = meshgrid(mean(AberratedLatticePSF(:,:,j),2))';
             end  
-            % Normalize
-            AberratedLatticePSF = AberratedLatticePSF/max(max(max(AberratedLatticePSF)));
-            AberratedLatticePSFDithered = AberratedLatticePSFDithered/max(max(max(AberratedLatticePSFDithered)));
 
-            xzPSF = AberratedLatticePSFDithered(:,:,(N+1)/2); xzPSF = xzPSF/max(max(xzPSF));
-            zPSF = xzPSF(:,(N+1)/2); 
-            xzOTF = abs(fftshift(fft2(xzPSF))); xzOTF = xzOTF/max(max(xzOTF));
-            zOTF = xzOTF(:,(N+1)/2); 
-            yzPSF = squeeze(AberratedLatticePSFDithered(:,(N+1)/2,:)); yzPSF = yzPSF/max(max(yzPSF));
-            yPSF = yzPSF((N+1)/2,:); 
+            % Normalize to unaberrated center 
+            AberratedLatticePSF = AberratedLatticePSF/Latticecenter(1,1);
+            AberratedLatticePSFDithered = AberratedLatticePSFDithered/Latticecenter(2,1);
 
-            % Calculate Overall PSF and OTF
+            xzPSFexc = AberratedLatticePSFDithered(:,:,(N+1)/2); 
+            zPSFexc = xzPSFexc(:,(N+1)/2); 
+            xzOTFexc = fftshift(fft2(ifftshift(xzPSFexc))); xzOTFexc = xzOTFexc/max(max(xzOTFexc));
+            zOTFexc = xzOTFexc(:,(N+1)/2); 
+            yzPSFexc = squeeze(AberratedLatticePSFDithered(:,(N+1)/2,:));
+            yPSFexc = yzPSFexc((N+1)/2,:); 
 
-            index = find(yPSF((N+1)/2:end) <= 0.5);
-            if ~isempty(index)
-                yFWHM = 2*Y_exc((N+1)/2+index(1)-1);
-            else
-                yFWHM = "N/A";
-            end
+            OverallPSF = AberratedLatticePSFDithered .* PSFdet;
+%             OverallPSF = OverallPSF/max(OverallPSF,[],'all');
+            OverallOTF = fftshift(fftn(ifftshift(OverallPSF)));
+            OverallOTF = OverallOTF/max(OverallOTF,[],'all');
+        
+            OverallxzPSF = OverallPSF(:,:,(N+1)/2); 
+            OverallzPSF = OverallxzPSF(:,(N+1)/2); 
+            OverallxzOTF = OverallOTF(:,:,(N+1)/2); 
+            OverallzOTF = OverallxzOTF(:,(N+1)/2); 
+
+            CoefMatrix = corrcoef(real(UnaberratedOverallzOTF),real(zOTFexc));
+            CorrCoef(counter) = CoefMatrix(1,2);
+            StrehlPeaks(counter) = max(AberratedLatticePSFDithered,[],'all');
+            StrehlCenter(counter) = AberratedLatticePSFDithered((N+1)/2,(N+1)/2,(N+1)/2)./ LatticePSFDithered((N+1)/2,(N+1)/2,(N+1)/2);
+
+            counter = counter + 1;
 
             h1 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig1);
-                imagesc(h1,X_exc,Z_exc,xzPSF);
+                imagesc(h1,X_exc,Z_exc,xzPSFexc);
                 h1.XAxis.Label.String = "x(\lambda_{exc}/n)";
                 h1.YAxis.Label.String = "z(\lambda_{exc}/n)";
                 h1.Colormap = colormap(hot(256));
@@ -104,10 +128,13 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h1.YAxis.Limits = [-20,20];
                 h1.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h1.DataAspectRatio = [1,1,1];
+                colorbar(h1)
+                clim(h1,[0,1])
+
 
             h2 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig2);
                 h2.NextPlot = "add";
-                plot(h2,Z_exc,zPSF,'LineWidth',2,'Color','r')
+                plot(h2,Z_exc,zPSFexc,'LineWidth',2,'Color','r')
                 plot(h2,Z_exc,UnaberratedzPSF,'LineWidth',1,'Color','g')
                 h2.XAxis.Label.String = "z(\lambda_{exc}/n)";
                 h2.XAxis.Limits = [-20,20];
@@ -118,10 +145,9 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 lgd.FontSize = 3;
                 grid on
                 h2.NextPlot = "replace";
-                
 
             h3 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig3);
-                imagesc(h3,KX_exc,KZ_exc,xzOTF)
+                imagesc(h3,KX_exc,KZ_exc,real(xzOTFexc))
                 h3.XAxis.Label.String = "k_x/(4\pin/\lambda_{exc})";
                 h3.YAxis.Label.String = "k_z/(4\pin/\lambda_{exc})";
                 h3.Colormap = colormap(hot(256));
@@ -129,37 +155,43 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h3.YAxis.Limits = [-0.5,0.5];
                 h3.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h3.DataAspectRatio = [1,1,1];
+                colorbar(h3)
+                clim(h3,[0,1])
 
             h4 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig4);
                 h4.NextPlot = "add";
-                plot(h4,KZ_exc,zOTF,'LineWidth',2,'Color','r')
-                plot(h4,KZ_exc,UnaberratedzOTF,'LineWidth',1,'Color','g')
+                plot(h4,KZ_exc,real(zOTFexc),'LineWidth',2,'Color','r')
+                plot(h4,KZ_exc,abs(zOTFexc),'LineWidth',1.5,'Color','b')
+                plot(h4,KZ_exc,real(UnaberratedzOTF),'LineWidth',1,'Color','g')
                 h4.XAxis.Label.String = "k_z/(4\pin/\lambda_{exc})";
                 h4.XAxis.Limits = [-0.5,0.5];
+                h4.YAxis.Limits = [-0.5,1];
                 h4.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h4.XAxis.TickValues = linspace(-0.5,0.5,11);
                 h4.XGrid = 'on';
                 h4.YGrid = 'on';
-                lgd = legend(h4,"Aberrated","Normal");
+                lgd = legend(h4,"real(Aberrated)","abs(Aberrated)","Normal");
                 lgd.FontSize = 3;
                 grid on
                 h4.NextPlot = "replace";
 
             h5 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig5);
-                imagesc(h5,Y_exc,Z_exc,yzPSF)
+                imagesc(h5,Y_exc,Z_exc,yzPSFexc)
                 h5.XAxis.Label.String = "y(\lambda_{exc}/n)";
                 h5.YAxis.Label.String = "z(\lambda_{exc}/n)";
                 h5.Colormap = colormap(hot(256));
                 h5.YAxis.Limits = [-40,40];
                 h5.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h5.DataAspectRatio = [1,1,1];
+                colorbar(h5)
+                clim(h5,[0,1])
 
             h6 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig6);
                 h6.NextPlot = "add";
-                plot(h6,Y_exc,yPSF,'LineWidth',2,'Color','r')
+                plot(h6,Y_exc,yPSFexc,'LineWidth',2,'Color','r')
                 plot(h6,Y_exc,UnaberratedyPSF,'LineWidth',1,'Color','g')
                 h6.XAxis.Label.String = "y(\lambda_{exc}/n)";
-                h6.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}' 'yFWHM=' num2str(yFWHM) '/lambda'];
+                h6.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h6.XGrid = 'on';
                 h6.YGrid = 'on';
                 lgd = legend(h6,"Aberrated","Normal");
@@ -176,6 +208,8 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h7.YAxis.Limits = [-20,20];
                 h7.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h7.DataAspectRatio = [1,1,1];
+                colorbar(h7)
+                clim(h7,[0,1])
 
             h8 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig8);
                 h8.NextPlot = "add";
@@ -192,7 +226,7 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h8.NextPlot = "replace";
 
             h9 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig9);
-                imagesc(h9,KX_exc,KZ_exc,OverallxzOTF)
+                imagesc(h9,KX_exc,KZ_exc,real(OverallxzOTF))
                 h9.XAxis.Label.String = "k_x/(4\pin/\lambda_{exc})";
                 h9.YAxis.Label.String = "k_z/(4\pin/\lambda_{exc})";
                 h9.Colormap = colormap(hot(256));
@@ -200,24 +234,28 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h9.YAxis.Limits = [-0.5,0.5];
                 h9.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h9.DataAspectRatio = [1,1,1];
+                colorbar(h9)
+                clim(h9,[0,1])
 
              h10 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig10);
                 h10.NextPlot = "add";
-                plot(h10,KZ_exc,OverallzOTF,'LineWidth',2,'Color','r')
-                plot(h10,KZ_exc,UnaberratedOverallzOTF,'LineWidth',1,'Color','g')
+                plot(h10,KZ_exc,real(OverallzOTF),'LineWidth',2,'Color','r')
+                plot(h10,KZ_exc,abs(OverallzOTF),'LineWidth',1.5,'Color','b')
+                plot(h10,KZ_exc,real(UnaberratedOverallzOTF),'LineWidth',1,'Color','g')
                 h10.XAxis.Label.String = "k_z/(4\pin/\lambda_{exc})";
                 h10.XAxis.Limits = [-0.5,0.5];
+                h10.YAxis.Limits = [-0.5,1];
                 h10.XAxis.TickValues = linspace(-0.5,0.5,11);
                 h10.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h10.XGrid = 'on';
                 h10.YGrid = 'on';
-                lgd = legend(h10,"Aberrated","Normal");
+                lgd = legend(h10,"real(Aberrated)","abs(Aberrated)","Normal");
                 lgd.FontSize = 3;
                 grid on
                 h10.NextPlot = "replace";           
                 
             h12 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig12);
-                imagesc(h12,X_exc,Z_exc,AberratedLatticePSF(:,:,(N+1)/2) / max(max(AberratedLatticePSF(:,:,(N+1)/2))));
+                imagesc(h12,X_exc,Z_exc,AberratedLatticePSF(:,:,(N+1)/2));
                 h12.XAxis.Label.String = "x(\lambda_{exc}/n)";
                 h12.YAxis.Label.String = "z(\lambda_{exc}/n)";
                 h12.Colormap = colormap(hot(256));
@@ -225,23 +263,25 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h12.YAxis.Limits = [-20,20];
                 h12.Title.String = ['Z_{' num2str(RadialOrder(k)) '}^{' num2str(AngularFrequency(k)) '}'];
                 h12.DataAspectRatio = [1,1,1];
+                colorbar(h12)
+                clim(h12,[0,1])
                 
             for jj = (N+1)/2-100:10:(N+1)/2+100
                 fig11 = figure('Name','Profile','WindowState','maximized','Visible','off');
                 colormap(hot(256))
 
-                xzPSF_exc = AberratedLatticePSF(:,:,jj); xzPSF_exc = xzPSF_exc/max(max(xzPSF_exc));
-                xzPSF_exc_dither = AberratedLatticePSFDithered(:,:,jj); xzPSF_exc_dither = xzPSF_exc_dither/max(max(xzPSF_exc_dither));
+                xzPSF_exc = AberratedLatticePSF(:,:,jj); 
+                xzPSF_exc_dither = AberratedLatticePSFDithered(:,:,jj); 
                 zPSF_exc = xzPSF_exc(:,(N+1)/2); 
                 zPSF_exc_dither = xzPSF_exc_dither(:,(N+1)/2); 
-                xzOTF_exc = abs(fftshift(fft2(xzPSF_exc))); xzOTF_exc = xzOTF_exc/max(max(xzOTF_exc));
+                xzOTF_exc = fftshift(fft2(ifftshift(xzPSF_exc))); xzOTF_exc = xzOTF_exc/max(max(xzOTF_exc));
                 zOTF_exc = xzOTF_exc(:,(N+1)/2);
 
-                UnaberratedxzPSF_exc = LatticePSF(:,:,jj); UnaberratedxzPSF_exc = UnaberratedxzPSF_exc/max(max(UnaberratedxzPSF_exc));
-                UnaberratedxzPSF_exc_dither = LatticePSFDithered(:,:,jj); UnaberratedxzPSF_exc_dither = UnaberratedxzPSF_exc_dither/max(max(UnaberratedxzPSF_exc_dither));
+                UnaberratedxzPSF_exc = LatticePSF(:,:,jj); 
+                UnaberratedxzPSF_exc_dither = LatticePSFDithered(:,:,jj); 
                 UnaberratedzPSF_exc = UnaberratedxzPSF_exc(:,(N+1)/2); 
                 UnaberratedzPSF_exc_dither = UnaberratedxzPSF_exc_dither(:,(N+1)/2); 
-                UnaberratedxzOTF_exc = abs(fftshift(fft2(UnaberratedxzPSF_exc))); UnaberratedxzOTF_exc = UnaberratedxzOTF_exc/max(max(UnaberratedxzOTF_exc));
+                UnaberratedxzOTF_exc = fftshift(fft2(ifftshift(UnaberratedxzPSF_exc))); UnaberratedxzOTF_exc = UnaberratedxzOTF_exc/max(max(UnaberratedxzOTF_exc));
                 UnaberratedzOTF_exc = UnaberratedxzOTF_exc(:,(N+1)/2);
 
                 h1_Unaberrated = subplot(3,3,1,'Parent',fig11);
@@ -255,6 +295,7 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h1_Unaberrated.XAxis.FontWeight = 'bold';
                 h1_Unaberrated.YAxis.FontWeight = 'bold';
                 colorbar;
+                clim([0,1])
                 axis image;
                 h1_image_unaberrated.Parent.XLim = [-40,40];
                 h1_image_unaberrated.Parent.YLim = [-40,40];
@@ -270,6 +311,7 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h1.XAxis.FontWeight = 'bold';
                 h1.YAxis.FontWeight = 'bold';
                 colorbar;
+                clim([0,1])
                 axis image;
                 h1_image.Parent.XLim = [-40,40];
                 h1_image.Parent.YLim = [-40,40];
@@ -310,6 +352,7 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h1_dither_unaberrated.XAxis.FontWeight = 'bold';
                 h1_dither_unaberrated.YAxis.FontWeight = 'bold';
                 colorbar;
+                clim([0,1])
                 axis image;
                 h1_image_dither_unaberrated.Parent.XLim = [-40,40];
                 h1_image_dither_unaberrated.Parent.YLim = [-40,40];
@@ -325,6 +368,7 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h1_dither.XAxis.FontWeight = 'bold';
                 h1_dither.YAxis.FontWeight = 'bold';
                 colorbar;
+                clim([0,1])
                 axis image;
                 h1_image_dither.Parent.XLim = [-40,40];
                 h1_image_dither.Parent.YLim = [-40,40];
@@ -357,8 +401,8 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h3_Unaberrated = subplot(3,3,7,'Parent',fig11);
                 h3_image_unaberrated = imagesc(h3_Unaberrated,KX_exc,...
                           KZ_exc,...
-                         UnaberratedxzOTF_exc) ;
-                title("XZ-Excitation OTF")
+                         real(UnaberratedxzOTF_exc)) ;
+                title("real(XZ-Excitation OTF)")
                 h3_Unaberrated.Title.FontSize = 5;
                 xlabel("k_x/(4\pin/\lambda_{exc})")
                 ylabel("k_z/(4\pin/\lambda_{exc})")
@@ -367,6 +411,7 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h3_Unaberrated.XAxis.FontWeight = 'bold';
                 h3_Unaberrated.YAxis.FontWeight = 'bold';
                 colorbar;
+                clim([0,1])
                 axis image
                 h3_image_unaberrated.Parent.XLim = [-0.5,0.5];
                 h3_image_unaberrated.Parent.YLim = [-0.5,0.5];
@@ -374,8 +419,8 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h3 = subplot(3,3,8,'Parent',fig11);
                 h3_image = imagesc(h3,KX_exc,...
                           KZ_exc,...
-                         xzOTF_exc) ;
-                title("Aberrated XZ-Excitation OTF")
+                         abs(xzOTF_exc)) ;
+                title("real(Aberrated XZ-Excitation OTF)")
                 h3.Title.FontSize = 5;
                 xlabel("k_x/(4\pin/\lambda_{exc})")
                 ylabel("k_z/(4\pin/\lambda_{exc})")
@@ -384,14 +429,16 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h3.XAxis.FontWeight = 'bold';
                 h3.YAxis.FontWeight = 'bold';
                 colorbar;
+                clim([0,1])
                 axis image
                 h3_image.Parent.XLim = [-0.5,0.5];
                 h3_image.Parent.YLim = [-0.5,0.5];
         
                 h4 = subplot(3,3,9,'Parent',fig11);
                 h4.NextPlot = "add";
-                h4_image = plot(h4,KZ_exc,zOTF_exc);
-                h4_image_unaberrated = plot(h4,KZ_exc,UnaberratedzOTF_exc);
+                h4_image = plot(h4,KZ_exc,real(zOTF_exc));
+                h4_image_abs = plot(h4,KZ_exc,abs(zOTF_exc));
+                h4_image_unaberrated = plot(h4,KZ_exc,real(UnaberratedzOTF_exc));
                 title("Z-Excitation OTF, K_X=0")
                 h4.Title.FontSize = 5;
                 xlabel("kz * \lambda / n")
@@ -403,12 +450,15 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
                 h4_image.Color = 'r';
                 h4_image.LineWidth = 2;
                 h4_image.Parent.XLim = [-1,1];
-                h4_image.Parent.YAxis.TickValues = linspace(0,1,11);
+                h4_image.Parent.YAxis.TickValues = linspace(-0.5,1,16);
                 h4.XLim = [-0.5,0.5];
+                h4.YLim = [-0.5,1];
                 h4_image.Parent.XAxis.TickValues = linspace(-0.5,0.5,11);
                 h4_image_unaberrated.Color = 'g';
                 h4_image_unaberrated.LineWidth = 1;
-                lgd = legend(h4,"Aberrated","Normal");
+                h4_image_abs.Color = 'b';
+                h4_image_abs.LineWidth = 1.5;
+                lgd = legend(h4,"real(Aberrated)","abs(Aberrated)","Normal");
                 lgd.FontSize = 3;
                 grid on
                 axis square
@@ -432,12 +482,22 @@ function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmpli
 
     exportgraphics(fig1, [pwd  '/ExcitationxzPSF.png'],'Resolution',300)
     exportgraphics(fig2, [pwd  '/ExcitationzPSF.png'],'Resolution',300)
-    exportgraphics(fig3, [pwd  '/ExcitationxzOTF.png'],'Resolution',300)
+    exportgraphics(fig3, [pwd  '/ExcitationxzOTFreal.png'],'Resolution',300)
     exportgraphics(fig4, [pwd  '/ExcitationzOTF.png'],'Resolution',300)
     exportgraphics(fig5, [pwd  '/ExcitationyzPSF.png'],'Resolution',300)
     exportgraphics(fig6, [pwd  '/ExcitationyPSF.png'],'Resolution',300)
     exportgraphics(fig7, [pwd  '/OverallxzPSF.png'],'Resolution',300)
     exportgraphics(fig8, [pwd  '/OverallzPSF.png'],'Resolution',300)
-    exportgraphics(fig9, [pwd  '/OverallxzOTF.png'],'Resolution',300)
+    exportgraphics(fig9, [pwd  '/OverallxzOTFreal.png'],'Resolution',300)
     exportgraphics(fig10, [pwd  '/OverallzOTF.png'],'Resolution',300)
     exportgraphics(fig12, [pwd  '/ExcitationxzPSFNonDither.png'],'Resolution',300)
+    exportgraphics(fig13, [pwd  '/Metrics.png'],'Resolution',300)
+
+    h1 = subplot(1,1,1,'Parent',fig13);
+    b1 = bar(1:length(CorrCoef),[CorrCoef;StrehlCenter;StrehlPeaks],0.5,'Parent',h1);
+    lgd = legend(b1,"Corr Coef (realOTF)","Center Intensity Strehl Ratio","Peak Intensity Strehl Ratio");
+    h1.XAxis.TickValues = 1:length(RadioOrderArray);
+    LabelArray = [RadioOrderArray;AngularFrequencyArray];
+    tickLabels = strtrim(sprintf('%d\\newline%d\n', LabelArray(:)));
+    xticklabels(b1,tickLabels)
+    grid on
