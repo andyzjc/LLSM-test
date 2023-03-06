@@ -171,7 +171,7 @@ function [CorrCoef,StrehlPeaks,StrehlCenter] = SimulateLatticeAberration(Lattice
                 h4.XGrid = 'on';
                 h4.YGrid = 'on';
                 lgd = legend(h4,"real(Aberrated)","abs(Aberrated)","Normal");
-                lgd.FontSize = 3;
+                lgd.FontSize = 2;
                 grid on
                 h4.NextPlot = "replace";
 
@@ -195,7 +195,7 @@ function [CorrCoef,StrehlPeaks,StrehlCenter] = SimulateLatticeAberration(Lattice
                 h6.XGrid = 'on';
                 h6.YGrid = 'on';
                 lgd = legend(h6,"Aberrated","Normal");
-                lgd.FontSize = 3;
+                lgd.FontSize = 2;
                 grid on
                 h6.NextPlot = "replace";
 
@@ -266,210 +266,210 @@ function [CorrCoef,StrehlPeaks,StrehlCenter] = SimulateLatticeAberration(Lattice
                 colorbar(h12)
                 clim(h12,[0,1])
                 
-            for jj = (N+1)/2-100:10:(N+1)/2+100
-                fig11 = figure('Name','Profile','WindowState','maximized','Visible','off');
-                colormap(hot(256))
-
-                xzPSF_exc = AberratedLatticePSF(:,:,jj); 
-                xzPSF_exc_dither = AberratedLatticePSFDithered(:,:,jj); 
-                zPSF_exc = xzPSF_exc(:,(N+1)/2); 
-                zPSF_exc_dither = xzPSF_exc_dither(:,(N+1)/2); 
-                xzOTF_exc = fftshift(fft2(ifftshift(xzPSF_exc))); xzOTF_exc = xzOTF_exc/max(max(xzOTF_exc));
-                zOTF_exc = xzOTF_exc(:,(N+1)/2);
-
-                UnaberratedxzPSF_exc = LatticePSF(:,:,jj); 
-                UnaberratedxzPSF_exc_dither = LatticePSFDithered(:,:,jj); 
-                UnaberratedzPSF_exc = UnaberratedxzPSF_exc(:,(N+1)/2); 
-                UnaberratedzPSF_exc_dither = UnaberratedxzPSF_exc_dither(:,(N+1)/2); 
-                UnaberratedxzOTF_exc = fftshift(fft2(ifftshift(UnaberratedxzPSF_exc))); UnaberratedxzOTF_exc = UnaberratedxzOTF_exc/max(max(UnaberratedxzOTF_exc));
-                UnaberratedzOTF_exc = UnaberratedxzOTF_exc(:,(N+1)/2);
-
-                h1_Unaberrated = subplot(3,3,1,'Parent',fig11);
-                h1_image_unaberrated = imagesc(h1_Unaberrated,X_exc,Z_exc,UnaberratedxzPSF_exc);
-                title("XZ-Excitation PSF - Y=" + num2str(Y_exc(jj),'%.2f') + "\lambda / n")
-                h1_Unaberrated.Title.FontSize = 5;
-                xlabel("x/(\lambda_{exc}/n)")
-                ylabel("z/(\lambda_{exc}/n)")
-                h1_Unaberrated.XAxis.FontSize = 5;
-                h1_Unaberrated.YAxis.FontSize = 5;
-                h1_Unaberrated.XAxis.FontWeight = 'bold';
-                h1_Unaberrated.YAxis.FontWeight = 'bold';
-                colorbar;
-                clim([0,1])
-                axis image;
-                h1_image_unaberrated.Parent.XLim = [-40,40];
-                h1_image_unaberrated.Parent.YLim = [-40,40];
-                
-                h1 = subplot(3,3,2,'Parent',fig11);
-                h1_image = imagesc(h1,X_exc,Z_exc,xzPSF_exc);
-                title("Aberrated XZ-Excitation PSF - Y=" + num2str(Y_exc(jj),'%.2f') + "\lambda / n")
-                h1.Title.FontSize = 5;
-                xlabel("x/(\lambda_{exc}/n)")
-                ylabel("z/(\lambda_{exc}/n)")
-                h1.XAxis.FontSize = 5;
-                h1.YAxis.FontSize = 5;
-                h1.XAxis.FontWeight = 'bold';
-                h1.YAxis.FontWeight = 'bold';
-                colorbar;
-                clim([0,1])
-                axis image;
-                h1_image.Parent.XLim = [-40,40];
-                h1_image.Parent.YLim = [-40,40];
-        
-                h2 = subplot(3,3,3,'Parent',fig11);
-                h2.NextPlot = "add";
-                h2_image = plot(h2,Z_exc,zPSF_exc);
-                h2_image_Unaberrated = plot(h2,Z_exc,UnaberratedzPSF_exc);
-                title("Z-Excitation PSF - X=0" + "\lambda / n")
-                h2.Title.FontSize = 5;
-                ylabel("Normalized a.u. ")
-                xlabel("z/(\lambda_{exc}/n)")
-                h2.XAxis.FontSize = 4;
-                h2.YAxis.FontSize = 5;
-                h2.XAxis.FontWeight = 'bold';
-                h2.YAxis.FontWeight = 'bold';
-                h2_image.LineWidth = 2;
-                h2_image.Color = 'r';
-                h2_image.Parent.XLim = [-20,20];
-                h2_image.Parent.YAxis.TickValues = linspace(0,1,11);
-                h2_image.Parent.XAxis.TickValues = linspace(-20,20,21);
-                h2_image_Unaberrated.LineWidth = 1;
-                h2_image_Unaberrated.Color = 'g';
-                lgd = legend(h2,"Aberrated","Normal");
-                lgd.FontSize = 3;
-                grid on
-                axis square
-                h2.NextPlot = "replace";
-
-                h1_dither_unaberrated = subplot(3,3,4,'Parent',fig11);
-                h1_image_dither_unaberrated = imagesc(h1_dither_unaberrated,X_exc,Z_exc,UnaberratedxzPSF_exc_dither);
-                title("Dithered XZ-Excitation PSF - Y=" + num2str(Y_exc(jj),'%.2f') + "\lambda / n")
-                h1_dither_unaberrated.Title.FontSize = 5;
-                xlabel("x/(\lambda_{exc}/n)")
-                ylabel("z/(\lambda_{exc}/n)")
-                h1_dither_unaberrated.XAxis.FontSize = 5;
-                h1_dither_unaberrated.YAxis.FontSize = 5;
-                h1_dither_unaberrated.XAxis.FontWeight = 'bold';
-                h1_dither_unaberrated.YAxis.FontWeight = 'bold';
-                colorbar;
-                clim([0,1])
-                axis image;
-                h1_image_dither_unaberrated.Parent.XLim = [-40,40];
-                h1_image_dither_unaberrated.Parent.YLim = [-40,40];
-
-                h1_dither = subplot(3,3,5,'Parent',fig11);
-                h1_image_dither = imagesc(h1_dither,X_exc,Z_exc,xzPSF_exc_dither);
-                title("Dithered Aberrated XZ-Excitation PSF - Y=" + num2str(Y_exc(jj),'%.2f') + "\lambda / n")
-                h1_dither.Title.FontSize = 5;
-                xlabel("x/(\lambda_{exc}/n)")
-                ylabel("z/(\lambda_{exc}/n)")
-                h1_dither.XAxis.FontSize = 5;
-                h1_dither.YAxis.FontSize = 5;
-                h1_dither.XAxis.FontWeight = 'bold';
-                h1_dither.YAxis.FontWeight = 'bold';
-                colorbar;
-                clim([0,1])
-                axis image;
-                h1_image_dither.Parent.XLim = [-40,40];
-                h1_image_dither.Parent.YLim = [-40,40];
-
-                h2_dither = subplot(3,3,6,'Parent',fig11);
-                h2_dither.NextPlot = "add";
-                h2_image_dither = plot(h2_dither,Z_exc,zPSF_exc_dither);
-                h2_image_dither_unaberrated = plot(h2_dither,Z_exc,UnaberratedzPSF_exc_dither);
-                title("Dithered Z-Excitation PSF - X=0" + "\lambda / n")
-                h2_dither.Title.FontSize = 5;
-                ylabel("Normalized a.u. ")
-                xlabel("z/(\lambda_{exc}/n)")
-                h2_dither.XAxis.FontSize = 4;
-                h2_dither.YAxis.FontSize = 5;
-                h2_dither.XAxis.FontWeight = 'bold';
-                h2_dither.YAxis.FontWeight = 'bold';
-                h2_image_dither.LineWidth = 2;
-                h2_image_dither.Color = 'r';
-                h2_image_dither.Parent.XLim = [-20,20];
-                h2_image_dither.Parent.YAxis.TickValues = linspace(0,1,11);
-                h2_image_dither.Parent.XAxis.TickValues = linspace(-20,20,21);
-                h2_image_dither_unaberrated.LineWidth = 1;
-                h2_image_dither_unaberrated.Color = 'g';
-                lgd = legend(h2_dither,"Aberrated","Normal");
-                lgd.FontSize = 3;
-                grid on
-                axis square
-                h2_dither.NextPlot = "replace";
-
-                h3_Unaberrated = subplot(3,3,7,'Parent',fig11);
-                h3_image_unaberrated = imagesc(h3_Unaberrated,KX_exc,...
-                          KZ_exc,...
-                         real(UnaberratedxzOTF_exc)) ;
-                title("real(XZ-Excitation OTF)")
-                h3_Unaberrated.Title.FontSize = 5;
-                xlabel("k_x/(4\pin/\lambda_{exc})")
-                ylabel("k_z/(4\pin/\lambda_{exc})")
-                h3_Unaberrated.XAxis.FontSize = 5;
-                h3_Unaberrated.YAxis.FontSize = 5;
-                h3_Unaberrated.XAxis.FontWeight = 'bold';
-                h3_Unaberrated.YAxis.FontWeight = 'bold';
-                colorbar;
-                clim([0,1])
-                axis image
-                h3_image_unaberrated.Parent.XLim = [-0.5,0.5];
-                h3_image_unaberrated.Parent.YLim = [-0.5,0.5];
-        
-                h3 = subplot(3,3,8,'Parent',fig11);
-                h3_image = imagesc(h3,KX_exc,...
-                          KZ_exc,...
-                         abs(xzOTF_exc)) ;
-                title("real(Aberrated XZ-Excitation OTF)")
-                h3.Title.FontSize = 5;
-                xlabel("k_x/(4\pin/\lambda_{exc})")
-                ylabel("k_z/(4\pin/\lambda_{exc})")
-                h3.XAxis.FontSize = 5;
-                h3.YAxis.FontSize = 5;
-                h3.XAxis.FontWeight = 'bold';
-                h3.YAxis.FontWeight = 'bold';
-                colorbar;
-                clim([0,1])
-                axis image
-                h3_image.Parent.XLim = [-0.5,0.5];
-                h3_image.Parent.YLim = [-0.5,0.5];
-        
-                h4 = subplot(3,3,9,'Parent',fig11);
-                h4.NextPlot = "add";
-                h4_image = plot(h4,KZ_exc,real(zOTF_exc));
-                h4_image_abs = plot(h4,KZ_exc,abs(zOTF_exc));
-                h4_image_unaberrated = plot(h4,KZ_exc,real(UnaberratedzOTF_exc));
-                title("Z-Excitation OTF, K_X=0")
-                h4.Title.FontSize = 5;
-                xlabel("kz * \lambda / n")
-                ylabel("Normalized a.u. ")
-                h4.XAxis.FontSize = 5; 
-                h4.YAxis.FontSize = 5; 
-                h4.XAxis.FontWeight = 'bold'; 
-                h4.YAxis.FontWeight = 'bold'; 
-                h4_image.Color = 'r';
-                h4_image.LineWidth = 2;
-                h4_image.Parent.XLim = [-1,1];
-                h4_image.Parent.YAxis.TickValues = linspace(-0.5,1,16);
-                h4.XLim = [-0.5,0.5];
-                h4.YLim = [-0.5,1];
-                h4_image.Parent.XAxis.TickValues = linspace(-0.5,0.5,11);
-                h4_image_unaberrated.Color = 'g';
-                h4_image_unaberrated.LineWidth = 1;
-                h4_image_abs.Color = 'b';
-                h4_image_abs.LineWidth = 1.5;
-                lgd = legend(h4,"real(Aberrated)","abs(Aberrated)","Normal");
-                lgd.FontSize = 3;
-                grid on
-                axis square
-                h4.NextPlot = "replace";
-        
-                exportgraphics(fig11,"Profile" + "N=" + num2str(i) + "M=" + num2str(AngularFrequency(k))...
-                    + ".gif",'Append',true,'Resolution',300)
-
-                close(fig11)
-                clear fig11
-            end
+%             for jj = (N+1)/2-100:10:(N+1)/2+100
+%                 fig11 = figure('Name','Profile','WindowState','maximized','Visible','off');
+%                 colormap(hot(256))
+% 
+%                 xzPSF_exc = AberratedLatticePSF(:,:,jj); 
+%                 xzPSF_exc_dither = AberratedLatticePSFDithered(:,:,jj); 
+%                 zPSF_exc = xzPSF_exc(:,(N+1)/2); 
+%                 zPSF_exc_dither = xzPSF_exc_dither(:,(N+1)/2); 
+%                 xzOTF_exc = fftshift(fft2(ifftshift(xzPSF_exc))); xzOTF_exc = xzOTF_exc/max(max(xzOTF_exc));
+%                 zOTF_exc = xzOTF_exc(:,(N+1)/2);
+% 
+%                 UnaberratedxzPSF_exc = LatticePSF(:,:,jj); 
+%                 UnaberratedxzPSF_exc_dither = LatticePSFDithered(:,:,jj); 
+%                 UnaberratedzPSF_exc = UnaberratedxzPSF_exc(:,(N+1)/2); 
+%                 UnaberratedzPSF_exc_dither = UnaberratedxzPSF_exc_dither(:,(N+1)/2); 
+%                 UnaberratedxzOTF_exc = fftshift(fft2(ifftshift(UnaberratedxzPSF_exc))); UnaberratedxzOTF_exc = UnaberratedxzOTF_exc/max(max(UnaberratedxzOTF_exc));
+%                 UnaberratedzOTF_exc = UnaberratedxzOTF_exc(:,(N+1)/2);
+% 
+%                 h1_Unaberrated = subplot(3,3,1,'Parent',fig11);
+%                 h1_image_unaberrated = imagesc(h1_Unaberrated,X_exc,Z_exc,UnaberratedxzPSF_exc);
+%                 title("XZ-Excitation PSF - Y=" + num2str(Y_exc(jj),'%.2f') + "\lambda / n")
+%                 h1_Unaberrated.Title.FontSize = 5;
+%                 xlabel("x/(\lambda_{exc}/n)")
+%                 ylabel("z/(\lambda_{exc}/n)")
+%                 h1_Unaberrated.XAxis.FontSize = 5;
+%                 h1_Unaberrated.YAxis.FontSize = 5;
+%                 h1_Unaberrated.XAxis.FontWeight = 'bold';
+%                 h1_Unaberrated.YAxis.FontWeight = 'bold';
+%                 colorbar;
+%                 clim([0,1])
+%                 axis image;
+%                 h1_image_unaberrated.Parent.XLim = [-40,40];
+%                 h1_image_unaberrated.Parent.YLim = [-40,40];
+%                 
+%                 h1 = subplot(3,3,2,'Parent',fig11);
+%                 h1_image = imagesc(h1,X_exc,Z_exc,xzPSF_exc);
+%                 title("Aberrated XZ-Excitation PSF - Y=" + num2str(Y_exc(jj),'%.2f') + "\lambda / n")
+%                 h1.Title.FontSize = 5;
+%                 xlabel("x/(\lambda_{exc}/n)")
+%                 ylabel("z/(\lambda_{exc}/n)")
+%                 h1.XAxis.FontSize = 5;
+%                 h1.YAxis.FontSize = 5;
+%                 h1.XAxis.FontWeight = 'bold';
+%                 h1.YAxis.FontWeight = 'bold';
+%                 colorbar;
+%                 clim([0,1])
+%                 axis image;
+%                 h1_image.Parent.XLim = [-40,40];
+%                 h1_image.Parent.YLim = [-40,40];
+%         
+%                 h2 = subplot(3,3,3,'Parent',fig11);
+%                 h2.NextPlot = "add";
+%                 h2_image = plot(h2,Z_exc,zPSF_exc);
+%                 h2_image_Unaberrated = plot(h2,Z_exc,UnaberratedzPSF_exc);
+%                 title("Z-Excitation PSF - X=0" + "\lambda / n")
+%                 h2.Title.FontSize = 5;
+%                 ylabel("Normalized a.u. ")
+%                 xlabel("z/(\lambda_{exc}/n)")
+%                 h2.XAxis.FontSize = 4;
+%                 h2.YAxis.FontSize = 5;
+%                 h2.XAxis.FontWeight = 'bold';
+%                 h2.YAxis.FontWeight = 'bold';
+%                 h2_image.LineWidth = 2;
+%                 h2_image.Color = 'r';
+%                 h2_image.Parent.XLim = [-20,20];
+%                 h2_image.Parent.YAxis.TickValues = linspace(0,1,11);
+%                 h2_image.Parent.XAxis.TickValues = linspace(-20,20,21);
+%                 h2_image_Unaberrated.LineWidth = 1;
+%                 h2_image_Unaberrated.Color = 'g';
+%                 lgd = legend(h2,"Aberrated","Normal");
+%                 lgd.FontSize = 3;
+%                 grid on
+%                 axis square
+%                 h2.NextPlot = "replace";
+% 
+%                 h1_dither_unaberrated = subplot(3,3,4,'Parent',fig11);
+%                 h1_image_dither_unaberrated = imagesc(h1_dither_unaberrated,X_exc,Z_exc,UnaberratedxzPSF_exc_dither);
+%                 title("Dithered XZ-Excitation PSF - Y=" + num2str(Y_exc(jj),'%.2f') + "\lambda / n")
+%                 h1_dither_unaberrated.Title.FontSize = 5;
+%                 xlabel("x/(\lambda_{exc}/n)")
+%                 ylabel("z/(\lambda_{exc}/n)")
+%                 h1_dither_unaberrated.XAxis.FontSize = 5;
+%                 h1_dither_unaberrated.YAxis.FontSize = 5;
+%                 h1_dither_unaberrated.XAxis.FontWeight = 'bold';
+%                 h1_dither_unaberrated.YAxis.FontWeight = 'bold';
+%                 colorbar;
+%                 clim([0,1])
+%                 axis image;
+%                 h1_image_dither_unaberrated.Parent.XLim = [-40,40];
+%                 h1_image_dither_unaberrated.Parent.YLim = [-40,40];
+% 
+%                 h1_dither = subplot(3,3,5,'Parent',fig11);
+%                 h1_image_dither = imagesc(h1_dither,X_exc,Z_exc,xzPSF_exc_dither);
+%                 title("Dithered Aberrated XZ-Excitation PSF - Y=" + num2str(Y_exc(jj),'%.2f') + "\lambda / n")
+%                 h1_dither.Title.FontSize = 5;
+%                 xlabel("x/(\lambda_{exc}/n)")
+%                 ylabel("z/(\lambda_{exc}/n)")
+%                 h1_dither.XAxis.FontSize = 5;
+%                 h1_dither.YAxis.FontSize = 5;
+%                 h1_dither.XAxis.FontWeight = 'bold';
+%                 h1_dither.YAxis.FontWeight = 'bold';
+%                 colorbar;
+%                 clim([0,1])
+%                 axis image;
+%                 h1_image_dither.Parent.XLim = [-40,40];
+%                 h1_image_dither.Parent.YLim = [-40,40];
+% 
+%                 h2_dither = subplot(3,3,6,'Parent',fig11);
+%                 h2_dither.NextPlot = "add";
+%                 h2_image_dither = plot(h2_dither,Z_exc,zPSF_exc_dither);
+%                 h2_image_dither_unaberrated = plot(h2_dither,Z_exc,UnaberratedzPSF_exc_dither);
+%                 title("Dithered Z-Excitation PSF - X=0" + "\lambda / n")
+%                 h2_dither.Title.FontSize = 5;
+%                 ylabel("Normalized a.u. ")
+%                 xlabel("z/(\lambda_{exc}/n)")
+%                 h2_dither.XAxis.FontSize = 4;
+%                 h2_dither.YAxis.FontSize = 5;
+%                 h2_dither.XAxis.FontWeight = 'bold';
+%                 h2_dither.YAxis.FontWeight = 'bold';
+%                 h2_image_dither.LineWidth = 2;
+%                 h2_image_dither.Color = 'r';
+%                 h2_image_dither.Parent.XLim = [-20,20];
+%                 h2_image_dither.Parent.YAxis.TickValues = linspace(0,1,11);
+%                 h2_image_dither.Parent.XAxis.TickValues = linspace(-20,20,21);
+%                 h2_image_dither_unaberrated.LineWidth = 1;
+%                 h2_image_dither_unaberrated.Color = 'g';
+%                 lgd = legend(h2_dither,"Aberrated","Normal");
+%                 lgd.FontSize = 3;
+%                 grid on
+%                 axis square
+%                 h2_dither.NextPlot = "replace";
+% 
+%                 h3_Unaberrated = subplot(3,3,7,'Parent',fig11);
+%                 h3_image_unaberrated = imagesc(h3_Unaberrated,KX_exc,...
+%                           KZ_exc,...
+%                          real(UnaberratedxzOTF_exc)) ;
+%                 title("real(XZ-Excitation OTF)")
+%                 h3_Unaberrated.Title.FontSize = 5;
+%                 xlabel("k_x/(4\pin/\lambda_{exc})")
+%                 ylabel("k_z/(4\pin/\lambda_{exc})")
+%                 h3_Unaberrated.XAxis.FontSize = 5;
+%                 h3_Unaberrated.YAxis.FontSize = 5;
+%                 h3_Unaberrated.XAxis.FontWeight = 'bold';
+%                 h3_Unaberrated.YAxis.FontWeight = 'bold';
+%                 colorbar;
+%                 clim([0,1])
+%                 axis image
+%                 h3_image_unaberrated.Parent.XLim = [-0.5,0.5];
+%                 h3_image_unaberrated.Parent.YLim = [-0.5,0.5];
+%         
+%                 h3 = subplot(3,3,8,'Parent',fig11);
+%                 h3_image = imagesc(h3,KX_exc,...
+%                           KZ_exc,...
+%                          abs(xzOTF_exc)) ;
+%                 title("real(Aberrated XZ-Excitation OTF)")
+%                 h3.Title.FontSize = 5;
+%                 xlabel("k_x/(4\pin/\lambda_{exc})")
+%                 ylabel("k_z/(4\pin/\lambda_{exc})")
+%                 h3.XAxis.FontSize = 5;
+%                 h3.YAxis.FontSize = 5;
+%                 h3.XAxis.FontWeight = 'bold';
+%                 h3.YAxis.FontWeight = 'bold';
+%                 colorbar;
+%                 clim([0,1])
+%                 axis image
+%                 h3_image.Parent.XLim = [-0.5,0.5];
+%                 h3_image.Parent.YLim = [-0.5,0.5];
+%         
+%                 h4 = subplot(3,3,9,'Parent',fig11);
+%                 h4.NextPlot = "add";
+%                 h4_image = plot(h4,KZ_exc,real(zOTF_exc));
+%                 h4_image_abs = plot(h4,KZ_exc,abs(zOTF_exc));
+%                 h4_image_unaberrated = plot(h4,KZ_exc,real(UnaberratedzOTF_exc));
+%                 title("Z-Excitation OTF, K_X=0")
+%                 h4.Title.FontSize = 5;
+%                 xlabel("kz * \lambda / n")
+%                 ylabel("Normalized a.u. ")
+%                 h4.XAxis.FontSize = 5; 
+%                 h4.YAxis.FontSize = 5; 
+%                 h4.XAxis.FontWeight = 'bold'; 
+%                 h4.YAxis.FontWeight = 'bold'; 
+%                 h4_image.Color = 'r';
+%                 h4_image.LineWidth = 2;
+%                 h4_image.Parent.XLim = [-1,1];
+%                 h4_image.Parent.YAxis.TickValues = linspace(-0.5,1,16);
+%                 h4.XLim = [-0.5,0.5];
+%                 h4.YLim = [-0.5,1];
+%                 h4_image.Parent.XAxis.TickValues = linspace(-0.5,0.5,11);
+%                 h4_image_unaberrated.Color = 'g';
+%                 h4_image_unaberrated.LineWidth = 1;
+%                 h4_image_abs.Color = 'b';
+%                 h4_image_abs.LineWidth = 1.5;
+%                 lgd = legend(h4,"real(Aberrated)","abs(Aberrated)","Normal");
+%                 lgd.FontSize = 3;
+%                 grid on
+%                 axis square
+%                 h4.NextPlot = "replace";
+%         
+%                 exportgraphics(fig11,"Profile" + "N=" + num2str(i) + "M=" + num2str(AngularFrequency(k))...
+%                     + ".gif",'Append',true,'Resolution',300)
+% 
+%                 close(fig11)
+%                 clear fig11
+%             end
         end
     end
 
@@ -491,13 +491,13 @@ function [CorrCoef,StrehlPeaks,StrehlCenter] = SimulateLatticeAberration(Lattice
     exportgraphics(fig9, [pwd  '/OverallxzOTFreal.png'],'Resolution',300)
     exportgraphics(fig10, [pwd  '/OverallzOTF.png'],'Resolution',300)
     exportgraphics(fig12, [pwd  '/ExcitationxzPSFNonDither.png'],'Resolution',300)
-    exportgraphics(fig13, [pwd  '/Metrics.png'],'Resolution',300)
-
+    
     h1 = subplot(1,1,1,'Parent',fig13);
     b1 = bar(1:length(CorrCoef),[CorrCoef;StrehlCenter;StrehlPeaks],0.5,'Parent',h1);
     lgd = legend(b1,"Corr Coef (realOTF)","Center Intensity Strehl Ratio","Peak Intensity Strehl Ratio");
     h1.XAxis.TickValues = 1:length(RadioOrderArray);
     LabelArray = [RadioOrderArray;AngularFrequencyArray];
     tickLabels = strtrim(sprintf('%d\\newline%d\n', LabelArray(:)));
-    xticklabels(b1,tickLabels)
+    h1.XAxis.TickLabels = tickLabels;
     grid on
+    exportgraphics(fig13, [pwd  '/Metrics.png'],'Resolution',300)
