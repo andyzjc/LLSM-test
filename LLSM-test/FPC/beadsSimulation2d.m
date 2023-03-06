@@ -38,7 +38,7 @@ function [Image1,Image2] = beadsSimulation(PSFexc,PSFdet,SNR)
         ImageIter = padarray(ImageIter,[0,missingCols - round(missingCols/2)],'pre');
 
         % get PSF
-        xzPSFexc = PSFexc(:,:,i);
+        xzPSFexc = PSFexc(:,:,(N+1)/2);
         xzPSFoverall = xzPSFexc .* xzPSFdet;
        
         % convolve beads with overallxzPSF
@@ -59,6 +59,6 @@ function [Image1,Image2] = beadsSimulation(PSFexc,PSFdet,SNR)
 
     Image1(Image1<0) = 0;
     Image2(Image2<0) = 0;
-
-%     Image1 = Image1/max(Image1,[],'all');
-%     Image2 = Image2/max(Image2,[],'all');
+    
+%      Image1 = Image1/max(Image1,[],'all');
+%      Image2 = Image2/max(Image2,[],'all');

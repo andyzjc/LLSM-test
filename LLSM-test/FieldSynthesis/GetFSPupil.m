@@ -1,11 +1,11 @@
-function [LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil(LatticeType,ProfileType,NAIdeal,deltaNA,MaskNAmax,MaskNAmin,WeightingRatio)
+function [LatticePupil,LatticeMask,LatticeMetaData] = GetFSPupil(LatticeType,ProfileType,NAIdeal,deltaNA,MaskNAmax,MaskNAmin,WeightingRatio)
     % generates pupil function of hex/square lattice
     % LatticeType = 'hex','square'
     % ProfileType = 'gaussian','tophat'
 if contains(LatticeType,'hex')
-      theta = [30,90,150,210,270,330];
+     theta = [30,90,150,210,270,330];
 %       theta = [30,150,210,330];
-%         theta = [90, 270];
+%        theta = [90, 270];
 elseif contains(LatticeType,'square')
      theta = [0,90,180,270];
 %         theta = [0,180];
@@ -101,7 +101,7 @@ elseif contains(ProfileType,'tophat') %tophat doesnt need mask -> beam width def
                 (N+1)/2 + round(kxposition(j)) ) = (1 ./ WeightingRatio);
             end
         end
-         LatticePupil = LatticePupil .*k_wave./ky_exc;
+        LatticePupil = LatticePupil .*k_wave./ky_exc;
     end
     LatticeMask = zeros(N,N);
 else
@@ -110,6 +110,8 @@ end
 
 LatticePupil(LatticePupil == inf) = 0;
 LatticePupil = fillmissing(LatticePupil,'constant',0);
+
+% convert to non-coherent 
 
 LatticeMetaData.NA = NAIdeal;
 LatticeMetaData.deltaNA = deltaNA;

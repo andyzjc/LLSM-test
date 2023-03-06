@@ -1,4 +1,4 @@
-function [FRC_lateral,kr_FRC_arr,kr_cutoff] = FourierRingCorrelation(img_1,img_2,pixel_dim)
+function [FRC_lateral,kr_FRC_arr,kr_cutoff] = FRC(img_1,img_2,pixel_dim)
 
     %Function to input two images and return the Fourier Ring Correlation and
     %1/7 cutoff frequency
@@ -31,8 +31,8 @@ function [FRC_lateral,kr_FRC_arr,kr_cutoff] = FourierRingCorrelation(img_1,img_2
     
     % transform kx and ky unit in FFT images from pixels to um^-1, and center
     % at 0
-    ky_vec = linspace(-floor(ky_n/2)*dk_voxel(1), floor(ky_n/2)*dk_voxel(1), ky_n);
-    kx_vec = linspace(-floor(kx_n/2)*dk_voxel(2), floor(kx_n/2)*dk_voxel(2), kx_n);
+    ky_vec = linspace(-((ky_n+1)/2)*dk_voxel(1), ((ky_n+1)/2)*dk_voxel(1), ky_n);
+    kx_vec = linspace(-((kx_n+1)/2)*dk_voxel(2), ((kx_n+1)/2)*dk_voxel(2), kx_n);
     
     
     %kx_arr, ky_arr are the kx and ky in um^-1 for each pixel in FFT images
@@ -44,7 +44,7 @@ function [FRC_lateral,kr_FRC_arr,kr_cutoff] = FourierRingCorrelation(img_1,img_2
     
     % calculate the maximum number of kr steps (rings) allowed for the FFT image (set to the minimum of
     % kxmax and kymax in units of pixels)
-    kr_max = min([floor(ky_n/2), floor(kx_n/2)]);
+    kr_max = min([(ky_n+1)/2, (kx_n+1)/2]);
     
     % create array of kr values that will be used to perform FRC calculation
     % (these are the ring radii that have been converted to units of spatial
@@ -68,7 +68,6 @@ function [FRC_lateral,kr_FRC_arr,kr_cutoff] = FourierRingCorrelation(img_1,img_2
     %diameters
     
     for j =1:round(size(kr_FRC_arr,2))
-        [num2str(j/round(size(kr_FRC_arr,2))) ' fraction complete']
         
        %Set the ring radius from the kr_FRC_array
         kr = kr_FRC_arr(j);
@@ -79,8 +78,9 @@ function [FRC_lateral,kr_FRC_arr,kr_cutoff] = FourierRingCorrelation(img_1,img_2
         % calculate the FRC all pixels within the fourier
         % ring using the FRC_mask and the values for numerator and demoninator
         % computed above
-        FRC_lateral(j) = sum(FRC_mask.*numerator, 'all') / (sqrt(sum(FRC_mask.*denominator_F1, 'all') .* sum(FRC_mask.*denominator_F2, 'all')));
-    
+        FRC_lateral(j) = sum(FRC_mask.*numerator, 'all') / ...
+                         (sqrt(sum(FRC_mask.*denominator_F1, 'all') ...
+                         .* sum(FRC_mask.*denominator_F2, 'all')));
     end
     
     % plot the FRC calculation results
@@ -88,7 +88,7 @@ function [FRC_lateral,kr_FRC_arr,kr_cutoff] = FourierRingCorrelation(img_1,img_2
 %     plot(kr_FRC_arr,abs(FRC_lateral))
 %     hold on
 %     plot([0 kr_FRC_arr(end)],[1/7 1/7]);
-%     kr_cutoff = min(kr_FRC_arr(abs(FRC_lateral)<1/7));
+     kr_cutoff = min(kr_FRC_arr(abs(FRC_lateral)<1/7));
 %     title(['kr = ' num2str(kr_cutoff), ' (1/um)']);
 %     xlabel(['Spatial Frequency (1/microns)']);
 %     ylabel(['FRC amplitude']);

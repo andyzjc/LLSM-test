@@ -1,9 +1,9 @@
-function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
+function SimulateLatticeAberration(LatticePupil,PSFdet,MaxRadialOrder,PhaseAmplitude)
     getParameters; %modify image parameter here
     CalculatePhysics;
 
     % Unaberrated
-    [LatticePSF,LatticePSFDithered] = SimulateLattice(LatticePupil);
+    [LatticePSF,LatticePSFDithered,Latticecenter] = SimulateLattice(LatticePupil);
     UnaberratedxzPSF = LatticePSFDithered(:,:,(N+1)/2); UnaberratedxzPSF = UnaberratedxzPSF/max(max(UnaberratedxzPSF));
     UnaberratedzPSF = UnaberratedxzPSF(:,(N+1)/2); 
     UnaberratedxzOTF = abs(fftshift(fft2(UnaberratedxzPSF))); UnaberratedxzOTF = UnaberratedxzOTF/max(max(UnaberratedxzOTF));
@@ -87,10 +87,6 @@ function SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
             yPSF = yzPSF((N+1)/2,:); 
 
             % Calculate Overall PSF and OTF
-            OverallxzPSF = getOverallPSF(xzPSF); OverallxzPSF = OverallxzPSF/max(max(OverallxzPSF));
-            OverallzPSF = OverallxzPSF(:,(N+1)/2); 
-            OverallxzOTF = getOverallOTF(xzOTF); OverallxzOTF = OverallxzOTF/max(max(OverallxzOTF));
-            OverallzOTF = OverallxzOTF(:,(N+1)/2); 
 
             index = find(yPSF((N+1)/2:end) <= 0.5);
             if ~isempty(index)

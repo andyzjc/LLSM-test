@@ -8,6 +8,10 @@ addpath([pwd '/' addpath(genpath("LLSM-test/"))])
 getParameters; %modify image parameter here
 CalculatePhysics;
 
+%% detection PSF
+PSFdet = getDetectionPSF;
+PSFdet = PSFdet./(max(max(max(PSFdet))));
+
 %% Simulation of SW Pair
 % generate pupil 
 % [SWPupil,SWMask] = GetSWPairPupil(ProfileType,NA1Ideal,NA2Ideal,

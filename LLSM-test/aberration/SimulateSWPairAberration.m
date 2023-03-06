@@ -1,4 +1,4 @@
-function SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
+function SimulateSWPairAberration(SWPupil,PSFdet,MaxRadialOrder,PhaseAmplitude)
     getParameters; %modify image parameter here
     CalculatePhysics;
 

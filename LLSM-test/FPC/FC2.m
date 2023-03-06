@@ -2,6 +2,10 @@ function fc2 = FC2(Image1,Image2)
     getParameters; %modify image parameter here
     CalculatePhysics;
 
+    % get rid of Nan
+    Image1 = fillmissing(Image1,'constant',0);
+    Image2 = fillmissing(Image2,'constant',0);
+
     % fourier transform 
     FTimage1 = fftshift(fft2(ifftshift(Image1)));
     FTimage2 = fftshift(fft2(ifftshift(Image2)));
