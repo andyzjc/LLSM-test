@@ -121,13 +121,11 @@ function [CorrCoef,StrehlPeaks,StrehlCenter] = SimulateSWPairAberration(SWPupil,
             CorrCoef(counter) = CoefMatrix(1,2);
             StrehlPeaks(counter) = max(AberratedPSFIncoherent,[],'all');
             StrehlCenter(counter) = AberratedPSFIncoherent((N+1)/2,(N+1)/2,(N+1)/2)./ PSFIncoherent((N+1)/2,(N+1)/2,(N+1)/2);
-            PSFIncoherent((N+1)/2,(N+1)/2,(N+1)/2)
-            max(PSFIncoherent,[],'all')
 
             counter = counter + 1;
 
             h1 = subplot(MaxRadialOrder-MinRadialOrder+1,MaxRadialOrder+1,((MaxRadialOrder+1)*(i-MinRadialOrder))+AngularFrequency_iteration(k),'Parent',fig1);
-                imagesc(h1,X_exc,Z_exc,xzPSFexc/max(max(xzPSFexc)));
+                imagesc(h1,X_exc,Z_exc,xzPSFexc);
                 h1.XAxis.Label.String = "x(\lambda_{exc}/n)";
                 h1.YAxis.Label.String = "z(\lambda_{exc}/n)";
                 h1.Colormap = colormap(hot(256));

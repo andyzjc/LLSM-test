@@ -1,4 +1,4 @@
-function [Vol1,Vol2,GTallbeads] = beadsSimulation3d_FWHM(PSFexc,PSFdet,SNR,FWHMIndex)
+function [Vol1,Vol2,GTallbeads] = beadsSimulation3d_plane(PSFexc,PSFdet,SNR,FWHMIndex)
     getParameters; %modify image parameter here
     CalculatePhysics;
 
@@ -30,9 +30,6 @@ function [Vol1,Vol2,GTallbeads] = beadsSimulation3d_FWHM(PSFexc,PSFdet,SNR,FWHMI
     PSFoverall = ShiftedPSFexc.* PSFdet;
     fftvol = fftshift(fftn(ifftshift(Vol))) .* fftshift(fftn(ifftshift(PSFoverall)));
     temp = abs(fftshift(ifftn(ifftshift(fftvol))));
-
-    window = hamming_3d(N,N,N);
-    temp = temp .* window;
 
     % add poiisson noise after convolution as shot noise
     Vol1 = temp + poissrnd(temp) .* 1/SNR;

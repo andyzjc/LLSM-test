@@ -26,9 +26,9 @@ function [FRCGraph,FRCUpperGraph,FRCLowerGraph,KR,FRCcutoffLateral,FRCcutoffAxia
         [FRCValueLower,~,~] = FRC(kXY1lower,kXY2lower,deltax);
 
         % average 
-        FRCUpperGraph(i+1,:) = abs(FRCValueUpper)';
-        FRCLowerGraph(i+1,:) = abs(FRCValueLower)';
-        FRCGraph(i+1,:) = (abs(FRCValueUpper)'+abs(FRCValueLower)')./2; 
+        % FRCUpperGraph(i+1,:) = abs(FRCValueUpper)';
+        % FRCLowerGraph(i+1,:) = abs(FRCValueLower)';
+        FRCGraph(i+1,:) = ((abs(FRCValueUpper)+abs(FRCValueLower))./2)'; 
 
     end
 
@@ -52,6 +52,8 @@ function [FRCGraph,FRCUpperGraph,FRCLowerGraph,KR,FRCcutoffLateral,FRCcutoffAxia
 %     end
     FRCcutoffLateral = 0;
     FRCcutoffAxial = 0;
+    FRCUpperGraph = 0;
+    FRCLowerGraph = 0;
 %         h1 = subplot(1,3,1);
 %         imagesc(KR,KZ_exc((N+1)/2:N),FRCGraph)
 %         xlabel("k_r/(4\pin/\lambda_{exc})")

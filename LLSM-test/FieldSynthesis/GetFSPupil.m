@@ -1,4 +1,4 @@
-function [LatticePupil,LatticeMask,LatticeMetaData] = GetFSPupil(LatticeType,ProfileType,NAIdeal,deltaNA,MaskNAmax,MaskNAmin,WeightingRatio)
+function [FSPupil,FSMask,FSMetaData] = GetFSPupil(LatticeType,ProfileType,NAIdeal,deltaNA,MaskNAmax,MaskNAmin,WeightingRatio)
     % generates pupil function of hex/square lattice
     % LatticeType = 'hex','square'
     % ProfileType = 'gaussian','tophat'
@@ -55,7 +55,8 @@ if contains(ProfileType,'gaussian')
         LatticePupil_Lattice = conv2(LatticePupil,gaussian_lattice,'same');
         LatticePupil = LatticePupil_SW + LatticePupil_Lattice;
         LatticeMask = ((k_MaskNAmax >= sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_MaskNAmin <= sqrt(kx_exc.^2 + kz_exc.^2)));
-        LatticePupil =  LatticePupil .* LatticeMask.*k_wave./ky_exc;
+%         LatticePupil =  LatticePupil .* LatticeMask.*k_wave./ky_exc;
+        LatticePupil =  LatticePupil .* LatticeMask;
     else
         deltaNA_Square = sqrt(2*deltaNA*NAIdeal);
         k_deltaNA_Square = deltaNA_Square ./ n * k_wave;
@@ -70,7 +71,8 @@ if contains(ProfileType,'gaussian')
         LatticePupil_Lattice = conv2(LatticePupil,gaussian_lattice,'same');
         LatticePupil = LatticePupil_SW + LatticePupil_Lattice;
         LatticeMask = ((k_MaskNAmax >= sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_MaskNAmin <= sqrt(kx_exc.^2 + kz_exc.^2)));
-        LatticePupil =  LatticePupil.*LatticeMask.*k_wave./ky_exc;
+%         LatticePupil =  LatticePupil.*LatticeMask.*k_wave./ky_exc;
+        LatticePupil =  LatticePupil.*LatticeMask;
     end 
 elseif contains(ProfileType,'tophat') %tophat doesnt need mask -> beam width define by deltaNA, following the non-diffractive condition
     
@@ -111,12 +113,21 @@ end
 LatticePupil(LatticePupil == inf) = 0;
 LatticePupil = fillmissing(LatticePupil,'constant',0);
 
-% convert to non-coherent 
+% convert to non-coherent (brutally) 
+counter = 1;
+for i = 1:length(kxposition)/2
+    temp = zeros(N,N);
+    temp(:,(N+1)/2 + round(kxposition(i))-1:(N+1)/2 + round(kxposition(i))+1) = ...
+        LatticePupil(:,(N+1)/2 + round(kxposition(i))-1:(N+1)/2 + round(kxposition(i))+1);
+    FSPupil(:,:,counter) = temp;
+    counter = counter + 1;
+end
+FSMask = LatticeMask;
 
-LatticeMetaData.NA = NAIdeal;
-LatticeMetaData.deltaNA = deltaNA;
-LatticeMetaData.NAmax = NAmax;
-LatticeMetaData.NAmin = NAmin;
-LatticeMetaData.MaskNAmax = MaskNAmax;
-LatticeMetaData.MaskNAmin = MaskNAmin;
-LatticeMetaData.NAWeighting = WeightingRatio;
+FSMetaData.NA = NAIdeal;
+FSMetaData.deltaNA = deltaNA;
+FSMetaData.NAmax = NAmax;
+FSMetaData.NAmin = NAmin;
+FSMetaData.MaskNAmax = MaskNAmax;
+FSMetaData.MaskNAmin = MaskNAmin;
+FSMetaData.NAWeighting = WeightingRatio;

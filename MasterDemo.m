@@ -17,9 +17,9 @@ PSFdet = PSFdet./(max(max(max(PSFdet))));
 % [SWPupil,SWMask] = GetSWPairPupil(ProfileType,NA1Ideal,NA2Ideal,
 %                                               deltaNA1,deltaNA2,...
 %                                               WeightRatio=I(NA1)/I(NA2));
-[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('tophat',0.3,0.15,...
-                                                           0.08,0.16,...
-                                                           1);
+[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('gaussian',0.4,0.1789/2,...
+                                                           0.04,0.1789,...
+                                                           7/10);
 
 % Coherent/Incoherent Propagation of SW pairs
 % [PSFCoherent,PSFIncoherent] = SimulateSWPair(SWPupil);
@@ -34,9 +34,9 @@ PrettyPlotSWPair(SWPupil,SWMask,SWPupilMetaData,PSFCoherent,PSFIncoherent,SWcent
 %                                                   NAIdeal,deltaNA,
 %                                                   MaskNAmax,MaskNAmin,
 %                                                   WeightingRatio=I(SW)/I(Lattice));
-[LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('hex','tophat', ...
-                                                             0.4,0.08, ...
-                                                             0.44,0.36,...
+[LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('square','gaussian', ...
+                                                             0.4,0.04, ...
+                                                             0.6,0.1,...
                                                              1);
 
 % Simulate lattice
@@ -50,14 +50,14 @@ PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,LatticePSF
 %% Simulation of SW Pair with a single aberrration mode 
 % Get single zernike mode function
 % Phase = GetSingleZmodePupil(RadialOrder,AngularFrequency,PhaseAmplitude);
-Phase = GetSingleZmodePupil(4,4,1);
+Phase = GetSingleZmodePupil(2,-2,1);
 
 % [SWPupil,SWMask] = GetSWPairPupil(ProfileType,NA1Ideal,NA2Ideal,
 %                                               deltaNA1,deltaNA2,...
 %                                               WeightRatio=I(NA1)/I(NA2));
 [SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('tophat',0.4,0.2,...
                                                            0.08,0.16,...
-                                                           0.68); 
+                                                           4/3); 
 AberratedSWPupil = SWPupil .* Phase;
 
 % Simulate Single mode aberrated SW Pair
@@ -70,7 +70,7 @@ PrettyPlotSWPair(AberratedSWPupil,SWMask,SWPupilMetaData,AberratedPSFCoherent,Ab
 %% Simulation of Lattice with a single aberrration mode 
 % Get single zernike mode function
 % Phase = GetSingleZmodePupil(RadialOrder,AngularFrequency,PhaseAmplitude);
-Phase = GetSingleZmodePupil(4,4,1);
+Phase = GetSingleZmodePupil(2,-2,1);
 
 % [LatticePupil,LatticeMask] = GetLatticePupil(LatticeType,ProfileType,
 %                                                   NAIdeal,deltaNA,
@@ -79,7 +79,7 @@ Phase = GetSingleZmodePupil(4,4,1);
 [LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('hex','tophat', ...
                                                              0.4,0.08, ...
                                                              0.6,0.2,...
-                                                             1);
+                                                             2);
 AberratedLatticePupil = LatticePupil.*Phase;
 
 % Simulate Single mode aberrated lattice
@@ -96,11 +96,13 @@ GetZmodePupil(6);
 
 % Simulate aberration for SW Pair
 % [AberratedPSFCoherent,AberratedPSFIncoherent] = SimulateSWPairAberration(SWPupil,MaxRadialOrder,PhaseAmplitude)
-SimulateSWPairAberration(SWPupil,6,1);
+[SWCorrCoef,SWStrehlPeaks,SWStrehlCenter] ...
+    = SimulateSWPairAberration(SWPupil,PSFdet,6,4*pi);
 
 % Simulate aberration for Lattice
 % [PSFCoherent,PSFIncoherent] = SimulateLatticeAberration(LatticePupil,MaxRadialOrder,PhaseAmplitude)
-SimulateLatticeAberration(LatticePupil,6,1);
+[LatticeCorrCoef,LatticeStrehlPeaks,LatticeStrehlCenter] ...
+    = SimulateLatticeAberration(LatticePupil,PSFdet,6,4*pi);
        
 
 

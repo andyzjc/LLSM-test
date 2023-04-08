@@ -5,7 +5,7 @@ getParameters; %modify image parameter here
 CalculatePhysics;
 
 %% aberration
-Phase_factor = GetSingleZmodePupil(2,-2,4*pi);
+Phase_factor = GetSingleZmodePupil(2,0,2*pi);
 
 %% detection 
 % detection
@@ -20,9 +20,9 @@ zOTFdet = real(xzOTFdet(:,(N+1)/2));
 xOTFdet = real(xzOTFdet((N+1)/2,:));
 
 %% SW
-[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('tophat',0.4,0.2,...
-0.08,0.16,...
-4/3);
+[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('gaussian',0,0.21,...
+0,0.16,...
+7/10); 
 AberratedSWPupil = SWPupil .* Phase_factor;
 
 [PSFCoherent,PSFIncoherent,SWcenter] = SimulateSWPair(SWPupil);
@@ -33,17 +33,27 @@ AberratedSWPupil = SWPupil .* Phase_factor;
 % PrettyPlotSWPair(AberratedSWPupil,SWMask,SWPupilMetaData,AberratedPSFCoherent,AberratedPSFIncoherent,AberratedSWcenter);
 
 %% Lattice
-[LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('hex','tophat', ...
+[LatticePupil,LatticeMask,LatticeMetaData] = GetLatticePupil('square','gaussian', ...
 0.4,0.08, ...
-0.44,0.36,...
-2);
-AberratedLatticePupil = LatticePupil .* Phase_factor;
+0.6,0.2,...
+1);
+%AberratedLatticePupil = LatticePupil .* Phase_factor;
 
 [LatticePSF,LatticePSFDithered,Latticecenter] = SimulateLattice(LatticePupil);
 % PrettyPlotLattice(LatticePupil,LatticeMask,LatticeMetaData,LatticePSF,LatticePSFDithered,Latticecenter); 
 
-[AberratedLatticePSF,AberratedLatticePSFDithered,AberratedLatticecenter] =  SimulateLattice(AberratedLatticePupil); 
+%[AberratedLatticePSF,AberratedLatticePSFDithered,AberratedLatticecenter] =  SimulateLattice(AberratedLatticePupil); 
 % PrettyPlotLattice(AberratedLatticePupil,LatticeMask,LatticeMetaData,AberratedLatticePSF,AberratedLatticePSFDithered,AberratedLatticecenter);
+
+%% Field Synthesis 
+[FSPupil,FSMask,FSMetaData] = GetFSPupil('hex','tophat', ...
+0.56,0.04, ...
+0.42,0.38,...
+2);
+
+[FSPSF,FScenter] = SimulateFS(FSPupil);
+% PrettyPlotFS(FSPupil,FSMask,FSMetaData,FSPSF,FScenter); 
+FSPSF = FSPSF/max(FSPSF,[],'all');
 
 %% Excitation
 % excitation
@@ -52,27 +62,46 @@ PSFIncoherent2 = PSFIncoherent/max(PSFIncoherent,[],'all');
 AberratedPSFIncoherent2 = AberratedPSFIncoherent/max(max(max(AberratedPSFIncoherent))); % normalized to itself
 
 LatticePSFDithered2 = LatticePSFDithered/max(LatticePSFDithered,[],'all');
+LatticePSF2 = LatticePSF/max(LatticePSF,[],'all');
 % AberratedLatticePSFDithered2 = AberratedLatticePSFDithered/Latticecenter(2,1); % normalized to unaberrated center
 AberratedLatticePSFDithered2 = AberratedLatticePSFDithered/max(max(max(AberratedLatticePSFDithered))); % normalized to itself
 
 %% Overall
-PSFexc = AberratedLatticePSFDithered2;
+PSFexc = PSFIncoherent;
+PSFexc = PSFexc/max(PSFexc,[],'all');
 xzPSFexc = PSFexc(:,:,(N+1)/2); 
 xyPSFexc = squeeze(PSFexc((N+1)/2,:,:)); 
 yzPSFexc = squeeze(PSFexc(:,(N+1)/2,:)); 
 xzOTFexc = fftshift(fft2(ifftshift(xzPSFexc)));
-zOTFexc = real(xzOTFexc(:,(N+1)/2));
+zOTFexc = real(xzOTFexc(:,(N+1)/2)); zOTFexc = zOTFexc/max(zOTFexc);
 xOTFexc = real(xzOTFexc((N+1)/2,:));
 
-% overall
-PSFoverall = PSFexc .* PSFdet;
-PSFoverallNOISE = PSFoverall + poissrnd(PSFoverall) .* 1/20; 
-PSFoverallNOISE = fillmissing(PSFoverallNOISE,'constant',0);
+% yindex = 1-(xyPSFexc((N+1)/2,:) <= 0.5*max(xyPSFexc((N+1)/2,:)));
+% yFWHM1 = find(yindex,1,'first') ;
+% yFWHM2 = find(yindex,1,'last');
 % 
-PSFdecon = LatticePSFDithered2.*PSFdet;
+% xindex = 1-(xyPSFexc(:,(N+1)/2) <= 0.5*max(xyPSFexc(:,(N+1)/2)));
+% xFWHM1 = find(xindex,1,'first') ;
+% xFWHM2 = find(xindex,1,'last');
+
+% figure(1)
+% imagesc(X_exc,Y_exc,squeeze(max(PSFexc,[],1)))
+% xlabel("y/(\lambda_{exc}/n)")
+% ylabel("x/(\lambda_{exc}/n)")
+% colorbar
+% colormap(hot)
+% hold on
+% rectangle('Position',[Y_exc(yFWHM1) X_exc(xFWHM1) Y_exc(yFWHM2)-Y_exc(yFWHM1) X_exc(xFWHM2)-X_exc(xFWHM1)],'EdgeColor','g','LineWidth',2)
+
+% overall
+ PSFoverall = PSFexc .* PSFdet;
+% PSFoverallNOISE = PSFoverall + poissrnd(PSFoverall) .* 1/20; 
+% PSFoverallNOISE = fillmissing(PSFoverallNOISE,'constant',0);
+% 
+% PSFdecon = LatticePSFDithered2.*PSFdet;
 % PSFdecon = PSFdecon + poissrnd(PSFdecon) .* 1/20; 
-PSFdecon = fillmissing(PSFdecon,'constant',0);
-PSFoverall = deconvlucy(PSFoverallNOISE,PSFdecon,20);
+% PSFdecon = fillmissing(PSFdecon,'constant',0);
+% PSFoverall = deconvlucy(PSFoverallNOISE,PSFdecon,20);
 % PSFoverall = PSFoverallNOISE;
 
 PSFoverall = PSFoverall./(max(max(max(PSFoverall))));
@@ -120,7 +149,6 @@ for j = 1:length(SNR)
         for k = 1:iterationloop
             test1 = [];
             test2 = [];
-
 %              test1 = xzPSFoverall + poissrnd(xzPSFoverall) * 1/SNR;
 %              test2 = xzPSFoverall + poissrnd(xzPSFoverall) * 1/SNR; 
 %              test1 = fillmissing(test1,'constant',0);
@@ -245,7 +273,7 @@ for dd = 1:length(allPSFexc)
             Zboundary = KZ(kz_Index);
             if isempty(Zboundary)
                 [~,kz_Index] = min(kr_line);
-                Zboundary = KZ(kr_Index);
+                Zboundary = KZ(kz_Index);
             end
     
             fig1 = figure;

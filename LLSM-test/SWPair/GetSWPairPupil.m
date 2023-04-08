@@ -32,6 +32,9 @@ kxposition2 = k_ideal(2) .* cosd(theta) ./deltak; % pixel
 kzposition2 = k_ideal(2) .* sind(theta) ./deltak; % pixel
 deltaNApixels2 = k_deltaNA(2) ./ deltak;
 
+SWMask(:,:,1) = ((k_NAmax(1) > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(1) < sqrt(kx_exc.^2 + kz_exc.^2)));
+SWMask(:,:,2) = ((k_NAmax(2) > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(2) <= sqrt(kx_exc.^2 + kz_exc.^2)));
+
 if contains(ProfileType,'gaussian')
     % NA1 Pupil
     gaussian1 = exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA(1)/2).^2) );
@@ -41,6 +44,7 @@ if contains(ProfileType,'gaussian')
             (N+1)/2 + round(kxposition1(j)),1) = 1;
     end
     SWPupil(:,:,1) = conv2(SWPupil(:,:,1),gaussian1,'same');
+%     SWPupil(:,:,1) = SWPupil(:,:,1).* SWMask(:,:,1);
 
     % NA2 Pupil
     if NAmin(2) > 0
@@ -50,14 +54,14 @@ if contains(ProfileType,'gaussian')
             (N+1)/2 + round(kzposition2(j)),...
             (N+1)/2 + round(kxposition2(j)),2) = 1;
         end
+        SWPupil(:,:,2) = (1 ./ WeightRatio) .* conv2(SWPupil(:,:,2),gaussian2,'same');
+%         SWPupil(:,:,2) = SWPupil(:,:,2).* SWMask(:,:,2);
     else
         % an airy beam
         gaussian2 = exp( -(kz_exc(:,1).^2)/ ( (k_deltaNA(2)).^2) );
         SWPupil( (N+1)/2,(N+1)/2, 2) = 1;
+        SWPupil(:,:,2) = (1 ./ WeightRatio) .* conv2(SWPupil(:,:,2),gaussian2,'same');
     end
-    SWPupil(:,:,2) = (1 ./ WeightRatio) .* conv2(SWPupil(:,:,2),gaussian2,'same');
-    % Masks
-
 elseif contains(ProfileType,'tophat') %tophat doesnt need mask -> beam width define by deltaNA, following the non-diffractive condition
     % NA1 Pupil
     for j = 1:length(kxposition1)
@@ -72,14 +76,9 @@ elseif contains(ProfileType,'tophat') %tophat doesnt need mask -> beam width def
         (N+1)/2 + round(kzposition2(j) - deltaNApixels2/2) : (N+1)/2 + round(kzposition2(j)+ deltaNApixels2/2),...
         (N+1)/2 + round(kxposition2(j)),2 ) = 1 / WeightRatio;
     end
-
 else
     error("Incorrect Intensity Profile")
 end
-
-SWMask(:,:,1) = ((k_NAmax(1) > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(1) < sqrt(kx_exc.^2 + kz_exc.^2)));
-SWMask(:,:,2) = ((k_NAmax(2) > sqrt(kx_exc.^2 + kz_exc.^2)) .* (k_NAmin(2) <= sqrt(kx_exc.^2 + kz_exc.^2)));
-SWPupil = SWPupil .* SWMask .* k_wave./ky_exc;
 SWPupil(SWPupil == inf) = 0;
 SWPupil = fillmissing(SWPupil,'constant',0);
 
