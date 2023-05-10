@@ -2,7 +2,7 @@ function GetZmodePupil(MaxRadialOrder)
     getParameters; %modify image parameter here
     CalculatePhysics;
     
-    [theta,r] = cart2pol(kx_exc./(0.6./n*k_wave),kz_exc./(0.6./n*k_wave));
+    [theta,r] = cart2pol(kx_exc./(0.65./n*k_wave),kz_exc./(0.65./n*k_wave));
     idx = r<=1;
     phase = zeros(size(kx_exc));
 

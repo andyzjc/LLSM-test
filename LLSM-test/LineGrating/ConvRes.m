@@ -1,25 +1,41 @@
 function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet)
     getParameters; %modify image parameter here
     CalculatePhysics;
-
+    
     % lineSpot = [0.0000,0.2202,0.4770,0.7705,1.1008,1.4677,1.8713,2.3116,...
     %             2.7886,3.3023,3.8526,4.4397,5.0635,5.7239,6.4211,7.1549,...
     %             7.9254,8.7326,9.5765,10.4571,14.0896]; %um 
-    lineSpot = [1 3 6 10 15 21 28 36 45 55 66 78 91 105 120 160];
+    N_line = 2049;
+    deltax_line = 0.01; %um
+    Spacing = 0.22:0.03:0.9; % um
+    lineSpot = zeros(1,length(Spacing)+1);
+    lineSpot(1,1) = 1;
+    for i = 1:length(Spacing)
+        lineSpot(1,i+1) = round(( Spacing(1,i))./deltax_line) + lineSpot(1,i);
+    end
 
     % define line array 
-    GTLines = zeros(N,N);
+    GTLines = zeros(N_line,N_line);
     GTLines(:,lineSpot) = 1;
-    Spacing = diff(lineSpot * deltax * 1000); %nm
-    LineZ = (0:N-1) * deltax;
+    LineZ = (0:N_line-1) * deltax_line;
+    LineZ = LineZ / wavelength_exc;
     
     % get overall PSF
     PSFoverall = PSFexc .* PSFdet;
     xzPSFOveralldecon = PSFoverall(:,:,(N+1)/2);
     % xzPSFOverall = xzPSFOveralldecon + poissrnd(xzPSFOveralldecon) .* 1/SNR;
+    
+    % interpolate overall PSF
+    rescale_factor = deltax/deltax_line;
+    up_Image_size = round(size(xzPSFOveralldecon,1) * rescale_factor);
+    Image_center = (up_Image_size+1)/2;
+    scaledxzPSFOverall = imresize(xzPSFOveralldecon,[up_Image_size,up_Image_size]);
+    scaledxzPSFOverall = scaledxzPSFOverall/max(max(scaledxzPSFOverall));
+    scaledxzPSFOverall = scaledxzPSFOverall(Image_center-(N_line+1)/2+1:Image_center+(N_line+1)/2-1,...
+                                  Image_center-(N_line+1)/2+1:Image_center+(N_line+1)/2-1);
 
     % Convolution with GT lines
-    convLines = conv2(GTLines,xzPSFOveralldecon','same');
+    convLines = conv2(GTLines,scaledxzPSFOverall','same');
     % convLines = convLines/max(max(convLines));
 
     % deconvlution 

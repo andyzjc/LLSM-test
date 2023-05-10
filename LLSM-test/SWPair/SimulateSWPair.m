@@ -22,28 +22,6 @@ Pupil_sum = Pupil1 + Pupil2;
     end
 PSFIncoherent = Profile_pupil1 + Profile_pupil2;
 
-%  box = ones(N,N);
-%  box(:,(N+1)/8:7*(N+1)/8) = 1;
-% hmwindow = hamming(N)*hamming(N)';
-% sample = fftshift( ifft2(ifftshift(Pupil1)) );
-% temp = sample .* hmwindow;
-% newPupil = (fftshift(fft2(ifftshift(temp))));
-% for i = 1:length(y_exc)
-%     propagator_exc = exp(2*pi * 1i * ky_exc * y_exc(i));
-%     PSFIncoherent1(:,:,i) = abs( fftshift( ifft2(ifftshift(newPupil .* propagator_exc)) ) ).^2;
-% end  
-% 
-% for i = 1:length(y_exc)
-%     propagator_exc = exp(2*pi * 1i * ky_exc * y_exc(i));
-%     temp = fftshift( ifft2(ifftshift(Pupil2 .* propagator_exc)) );
-%     temp = box .* temp;
-%     newPupil = real(fftshift(fft2(ifftshift(temp))));
-%     PSFIncoherent2(:,:,i) = abs( fftshift( ifft2(ifftshift(newPupil .* propagator_exc)) ) ).^2;
-% end  
-% PSFIncoherent = PSFIncoherent1 + PSFIncoherent2;
-% PSFCoherent = PSFIncoherent;
-
-
 [center(1,1),center(1,2)] = max(PSFCoherent,[],'all'); % value, index
 [center(2,1),center(2,2)] = max(PSFIncoherent,[],'all'); % value, index
 [center(3,1),center(3,2)] = max(Profile_pupil1,[],'all'); % value, index

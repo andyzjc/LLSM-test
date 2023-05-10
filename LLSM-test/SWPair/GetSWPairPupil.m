@@ -92,3 +92,20 @@ SWPupilMeta.NA1min = NAmin(1);
 SWPupilMeta.NA2min = NAmin(2);
 SWPupilMeta.WeightingRatio = WeightRatio;
 
+% apply sigmoid bounding to x and z sample based on pupil
+% temp = zeros(1,N);
+% temp(1:(N+1)/2-1) = 1./(1+exp(-(-(N+1)/4+1:(N+1)/4-1)));
+% temp((N+1)/2:end) = flip(1./(1+exp(-(-(N+1)/4:(N+1)/4-1))));
+% [boundx, ~] = meshgrid(temp);
+
+% Sample = fftshift(fft2(ifftshift(SWPupil(:,:,1))));
+% Sample = Sample.*boundx;
+% SWPupil(:,:,1) = fftshift(ifft2(ifftshift((Sample))));
+% SWPupil(:,:,1) = SWPupil(:,:,1)/(max(SWPupil(:,:,1),[],'all'));
+% SWPupil(:,:,1) = SWPupil(:,:,1).* WeightRatio;
+% 
+% Sample = fftshift(fft2(ifftshift(SWPupil(:,:,2))));
+% Sample = Sample.*boundx;
+% SWPupil(:,:,2) = fftshift(ifft2(ifftshift((Sample))));
+% SWPupil(:,:,2) = SWPupil(:,:,2)/(max(SWPupil(:,:,2),[],'all'));
+

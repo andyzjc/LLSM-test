@@ -2,6 +2,15 @@ function [LatticePSF,LatticePSFDithered,center] = SimulateLattice(LatticePupil)
 
 getParameters;
 CalculatePhysics;
+% 
+% temp = zeros(1,N);
+% temp(1:(N+1)/2-1) = 1./(1+exp(-(-(N+1)/4+1:(N+1)/4-1)));
+% temp((N+1)/2:end) = flip(1./(1+exp(-(-(N+1)/4:(N+1)/4-1))));
+% [boundx, ~] = meshgrid(temp);
+% Sample = fftshift(fft2(ifftshift(LatticePupil)));
+% Sample = Sample.*boundx;
+% LatticePupil = fftshift(ifft2(ifftshift((Sample))));
+% LatticePupil = LatticePupil/max(LatticePupil,[],'all');
 
 LatticePSF = zeros(N,N, N);
 LatticePSFDithered = zeros(N,N, N);
@@ -12,26 +21,6 @@ for i = 1:length(y_exc)
     LatticePSF(:,:,i) = abs( fftshift( ifft2(ifftshift(LatticePupil .* propagator_exc)) ) ).^2;
     LatticePSFDithered(:,:,i) = meshgrid(mean(LatticePSF(:,:,i),2))';
 end  
-
-% box = zeros(N,N);
-% box(:,(N+1)/8:7*(N+1)/8) = 1;
-% for i = 1:length(y_exc)
-%     propagator_exc = exp(2*pi * 1i * ky_exc * y_exc(i));
-%     temp = fftshift( ifft2(ifftshift(LatticePupil .* propagator_exc)) );
-%     temp = box .* temp;
-%     newPupil = fftshift(fft2(ifftshift(temp)));
-%     LatticePSF(:,:,i) = abs( fftshift( ifft2(ifftshift(newPupil .* propagator_exc)) ) ).^2;
-%     LatticePSFDithered(:,:,i) = meshgrid(mean(LatticePSF(:,:,i),2))';
-% end  
-
-% % real dither 
-% LatticePSFDithered = LatticePSF;
-% dither_step = 64;
-% dither_period = 30; %um
-% for j = 1:dither_step
-%     LatticePSFDithered = LatticePSFDithered + ...
-%         circshift(LatticePSF,round(dither_period / deltax ),2);
-% end
 
 % find maximum 
 [center(1,1),center(1,2)] = max(LatticePSF,[],'all'); % value,  index

@@ -1,4 +1,4 @@
-function [Averagefc3,Averagefc3FWHM,KR,KZ] = RunFC3(PSFexc,PSFdet,Iter,SNR,yFWHM)
+function [Averagefc3,Averagefc3FWHM,KR,KZ] = RunFC3(PSFexc,PSFdet,OTFmask,Iter,SNR,yFWHM)
     getParameters; %modify image parameter here
     CalculatePhysics;
 
@@ -12,6 +12,7 @@ function [Averagefc3,Averagefc3FWHM,KR,KZ] = RunFC3(PSFexc,PSFdet,Iter,SNR,yFWHM
     end
     Averagefc3 = Averagefc3/Iter;
     Averagefc3 = Averagefc3/max(Averagefc3,[],'all');
+    Averagefc3 = Averagefc3 .* OTFmask;
 
     for i = 1:length(Iter)
         [BeadsVol1,BeadsVol2,~] = beadsSimulation3d_plane(PSFexc,PSFdet,SNR,yFWHM);
@@ -20,6 +21,7 @@ function [Averagefc3,Averagefc3FWHM,KR,KZ] = RunFC3(PSFexc,PSFdet,Iter,SNR,yFWHM
     end
     Averagefc3FWHM = Averagefc3FWHM/Iter;
     Averagefc3FWHM = Averagefc3FWHM/max(Averagefc3FWHM,[],'all');
+    Averagefc3FWHM = Averagefc3FWHM .* OTFmask;
 
     % find max kz
     KZ = KZ_exc((N+1)/2:end);

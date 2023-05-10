@@ -29,10 +29,10 @@ function [FRCGraph,FRCUpperGraph,FRCLowerGraph,KR,FRCcutoffLateral,FRCcutoffAxia
         % FRCUpperGraph(i+1,:) = abs(FRCValueUpper)';
         % FRCLowerGraph(i+1,:) = abs(FRCValueLower)';
         FRCGraph(i+1,:) = ((abs(FRCValueUpper)+abs(FRCValueLower))./2)'; 
-
     end
 
     KR = KR./(2*k_wave);
+
 %     % lateral cutoff (kr)
 %     for i = 1:size(FRCGraph,1)
 %         line = FRCGraph(i,:);

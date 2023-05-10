@@ -2,7 +2,7 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
     getParameters; %modify image parameter here
     CalculatePhysics;
 
-    [theta,r] = cart2pol(kx_exc./(0.6./n*k_wave),kz_exc./(0.6./n*k_wave));
+    [theta,r] = cart2pol(kx_exc./(0.65./n*k_wave),kz_exc./(0.65./n*k_wave));
     idx = r<=1;
 
     SWPSF = zeros(N,N);
@@ -37,7 +37,7 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
                 AberratedSWPSF = AberratedSWPSF + abs(fftshift(ifft2(fftshift(AberratedSWPupil)))).^2;
             end
             AberratedSWPSF = AberratedSWPSF./SWvalue; 
-            SW_SRatio(counter,1) = AberratedSWPSF((N+1)/2,(N+1)/2);
+            SW_SRatio(counter,1) = AberratedSWPSF((N+1)/2,(N+1)/2); % only at focal point/ on optical axis
 
             AberratedLatticePupil = zeros(size(phase));
             AberratedLatticePSF = zeros(size(phase));
