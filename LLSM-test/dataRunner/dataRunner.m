@@ -19,7 +19,7 @@ PSFdet = PSFdet./(max(max(max(PSFdet))));
 % zOTFdet = real(xzOTFdet(:,(N+1)/2));
 
 %% Unaberrated
-
+clc
 NA1 = 0.58;
 deltaNA = 0.04;
 LatticeType = 'hex';
@@ -124,7 +124,7 @@ xzOTF = abs(squeeze(overallOTF(:,(N+1)/2,:)))/max(abs(squeeze(overallOTF(:,(N+1)
 SWOTFmask = xzOTF((N+1)/2:end,(N+1)/2:end) >= OTFthreshold;
 
 [SWAveragefc3,SWAveragefc3FWHM,~,~] = RunFC3(PSFIncoherent,PSFdet,SWOTFmask,Iter,SNR,SWyFWHM2);
-[SWconvLines,lineSpot,~,Line_Z] = ConvRes(PSFIncoherent,PSFdet);
+[SWconvLines,lineSpot,~,Line_Z] = ConvRes(PSFIncoherent,PSFdet,SNR);
 save([SWDatasavingdir '/PSFIncoherent.mat'],'PSFIncoherent')
 save([ SWDatasavingdir '/PSFIncoherent_Center.mat'], 'SWcenter')
 save([ SWDatasavingdir '/PSFIncoherent_FC3.mat'], 'SWAveragefc3')
@@ -147,7 +147,7 @@ xzOTF = abs(squeeze(overallOTF(:,(N+1)/2,:)))/max(abs(squeeze(overallOTF(:,(N+1)
 LatticeOTFmask = xzOTF((N+1)/2:end,(N+1)/2:end) >= OTFthreshold;
 
 [LatticeAveragefc3,LatticeAveragefc3FWHM,~,~] = RunFC3(LatticePSFDithered,PSFdet,LatticeOTFmask,Iter,SNR,LatticeyFWHM2);
-[LatticeconvLines,~,~,~] = ConvRes(LatticePSFDithered,PSFdet);
+[LatticeconvLines,~,~,~] = ConvRes(LatticePSFDithered,PSFdet,SNR);
 save([ LLSDatasavingdir '/LatticePSF.mat'], 'LatticePSF')
 save([ LLSDatasavingdir '/LatticePSFDithered.mat'], 'LatticePSFDithered')
 save([ LLSDatasavingdir '/Latticecenter.mat'], 'Latticecenter')
@@ -160,8 +160,8 @@ clc
 [theta,r] = cart2pol(kx_exc./(0.65./n*k_wave),kz_exc./(0.65./n*k_wave));
 idx = r<=1;
 
-MinRadialOrder = 2;
-MaxRadialOrder = 2;
+MinRadialOrder = 0;
+MaxRadialOrder = 6;
 PhaseAmplitude = 6; 
 
 RadioOrderArray = [];
@@ -215,18 +215,18 @@ for i = MinRadialOrder:MaxRadialOrder
         temp1(:,:,2) = AberratedPupil2;
         [temp3,temp4,temp5] = SimulateSWPair(temp1);
         AberratedSWPupil{counter,1} = temp1;
-        AberratedPSFCoherent{counter,1} = temp3 /SWcenter(1,1);
+        %AberratedPSFCoherent{counter,1} = temp3 /SWcenter(1,1);
         AberratedPSFIncoherent{counter,1} = temp4 /SWcenter(2,1);
         AberratedSWcenter{counter,1} = temp5;
         SWAberratedsavingdir = [SWsavingdir 'Z_' num2str(i) '_' num2str(AngularFrequency(k)) '_Amplitude_' num2str(PhaseAmplitude) '/'];
         mkdir(SWAberratedsavingdir)
-        grapthSW(NA1,deltaNA,LatticeType,SWweighting,AberratedPSFIncoherent{counter,1},AberratedPSFCoherent{counter,1},AberratedSWPupil{counter,1},...
+        grapthSW(NA1,deltaNA,LatticeType,SWweighting,AberratedPSFIncoherent{counter,1},temp3 /SWcenter(1,1),AberratedSWPupil{counter,1},...
            PSFdet,[SWAberratedsavingdir 'Z_' num2str(i) '_' num2str(AngularFrequency(k)) '_']);
         counter = counter +1;
     end
 end
 
-save([SWDatasavingdir '/AberratedPSFCoherent.mat'],'AberratedPSFCoherent','-v7.3')
+%save([SWDatasavingdir '/AberratedPSFCoherent.mat'],'AberratedPSFCoherent','-v7.3')
 save([SWDatasavingdir '/AberratedPSFIncoherent.mat'],'AberratedPSFIncoherent','-v7.3')
 save([SWDatasavingdir '/AberratedSWPupil.mat'],'AberratedSWPupil','-v7.3')
 save([SWDatasavingdir '/AberratedSWcenter.mat'],'AberratedSWcenter','-v7.3')
@@ -245,47 +245,35 @@ for i = MinRadialOrder:MaxRadialOrder
         temp2(idx) = LatticePupil(idx) .* exp(PhaseAmplitude.* 1i .*phase(idx));
         [temp6,temp7,temp8] = SimulateLattice(temp2);
         AberratedLatticePupil{counter,1} = temp2;
-        AberratedLatticePSF{counter,1} = temp6/Latticecenter(1,1);
+        %AberratedLatticePSF{counter,1} = temp6/Latticecenter(1,1);
         AberratedLatticePSFDithered{counter,1} = temp7/Latticecenter(2,1);
         AberratedLatticecenter{counter,1} = temp8;
         LatticeAberratedsavingdir = [Latticesavingdir 'Z_' num2str(i) '_' num2str(AngularFrequency(k)) '_Amplitude_' num2str(PhaseAmplitude) '/'];
         mkdir(LatticeAberratedsavingdir)
-        grapthLattice(NA1,deltaNA,LatticeType,Latticeweighting,AberratedLatticePSF{counter,1},AberratedLatticePSFDithered{counter,1},AberratedLatticePupil{counter,1},...
+        grapthLattice(NA1,deltaNA,LatticeType,Latticeweighting,temp6/Latticecenter(1,1),AberratedLatticePSFDithered{counter,1},AberratedLatticePupil{counter,1},...
             PSFdet,[LatticeAberratedsavingdir 'Z_' num2str(i) '_' num2str(AngularFrequency(k)) '_'])
         counter = counter +1;
     end
 end        
 save([ LLSDatasavingdir '/AberratedLatticePupil.mat'], 'AberratedLatticePupil','-v7.3')
-save([ LLSDatasavingdir '/AberratedLatticePSF.mat'], 'AberratedLatticePSF','-v7.3')
+%save([ LLSDatasavingdir '/AberratedLatticePSF.mat'], 'AberratedLatticePSF','-v7.3')
 save([ LLSDatasavingdir '/AberratedLatticePSFDithered.mat'], 'AberratedLatticePSFDithered','-v7.3')
 save([ LLSDatasavingdir '/AberratedLatticeCenter.mat'], 'AberratedLatticecenter','-v7.3')
 
 %% Analysis
-SW_SRatio_Focal = zeros(size(AberratedPSFIncoherent));
-SW_SRatio_Focal_FWHM = SW_SRatio_Focal;
-SW_SRatio_3D = SW_SRatio_Focal;
-SW_SRatio_yz = SW_SRatio_Focal;
-SW_SRatio_yz_overall = SW_SRatio_Focal;
-SW_SRatio_corrected = SW_SRatio_Focal;
+SW_SRatio_FocalOverall = zeros(size(AberratedPSFIncoherent));
+SW_SRatio_corrected = SW_SRatio_FocalOverall;
 
 AberratedSWAveragefc3 = cell(length(RadioOrderArray),1);
 AberratedSWAveragefc3FWHM = AberratedSWAveragefc3;
 AberratedSWconvLines = AberratedSWAveragefc3;
 for i = 1:length(AberratedPSFIncoherent)
-    tempPSF = AberratedPSFIncoherent{i,1};
+    tempPSF = AberratedPSFIncoherent{i,1}.*PSFdet;
     tempSWcenter = AberratedSWcenter{i,1};
 
     % Srethl ratio
-    SW_SRatio_Focal(i,1) = tempPSF((N+1)/2,(N+1)/2,(N+1)/2); % focal point, excitation
-    SW_SRatio_Focal_FWHM(i,1) = tempPSF((N+1)/2,(N+1)/2,SWyFWHM2); % HWHM, axis, excitation
-    tempyzPSF = squeeze(tempPSF(:,(N+1)/2,:));
-    SW_SRatio_yz(i,1) = max(tempyzPSF,[],'all'); % yz excitation 
-
-    [~,col] = find(tempyzPSF==max(max(tempyzPSF)));
-    SW_SRatio_yz_overall(i,1) = max( PSFdet(:,(N+1)/2,(N+1)/2) .* tempyzPSF(:,col) ); % yz overall 
-    
-    SW_SRatio_3D(i,1) = max(tempPSF,[],'all');
-
+    SW_SRatio_FocalOverall(i,1) = max(tempPSF(:,:,(N+1)/2),[],'all'); % focal point, excitation
+   
     % aberration correction (quick guess) 
     SW_SRatio_corrected(i,1) = (tempSWcenter(3,1) + tempSWcenter(4,1))/SWcenter(2,1);
 
@@ -293,53 +281,31 @@ for i = 1:length(AberratedPSFIncoherent)
     [AberratedSWAveragefc3{i,1},AberratedSWAveragefc3FWHM{i,1},~,~] = RunFC3(tempPSF,PSFdet,SWOTFmask,Iter,SNR,SWyFWHM2);
 
     % line grating
-    [AberratedSWconvLines{i,1},~,~,~] = ConvRes(tempPSF,PSFdet);
+    [AberratedSWconvLines{i,1},~,~,~] = ConvRes(tempPSF,PSFdet,SNR);
 end
-save([SWDatasavingdir '/SW_SRatio_Focal.mat'],'SW_SRatio_Focal')
-save([SWDatasavingdir '/SW_SRatio_FWHM.mat'],'SW_SRatio_Focal_FWHM')
-save([SWDatasavingdir '/SW_SRatio_3D.mat'],'SW_SRatio_3D')
-save([SWDatasavingdir '/SW_SRatio_corrected.mat'],'SW_SRatio_corrected')
-save([SWDatasavingdir '/SW_SRatio_yz.mat'],'SW_SRatio_yz')
-save([SWDatasavingdir '/SW_SRatio_yz_overall.mat'],'SW_SRatio_yz_overall')
-
+save([SWDatasavingdir '/SW_SRatio_FocalOverall.mat'],'SW_SRatio_FocalOverall')
 save([SWDatasavingdir '/AberratedSWAveragefc3.mat'],'AberratedSWAveragefc3')
 save([SWDatasavingdir '/AberratedSWAveragefc3FWHM.mat'],'AberratedSWAveragefc3FWHM')
 save([SWDatasavingdir '/AberratedSWconvLines.mat'],'AberratedSWconvLines')
 
-Lattice_SRatio_Focal = zeros(size(AberratedLatticePSFDithered));
-Lattice_SRatio_Focal_FWHM = Lattice_SRatio_Focal;
-Lattice_SRatio_yz = Lattice_SRatio_Focal;
-Lattice_SRatio_yz_overall = Lattice_SRatio_Focal;
-Lattice_SRatio_3D = Lattice_SRatio_Focal;
+Lattice_SRatio_FocalOverall = zeros(size(AberratedLatticePSFDithered));
 
 AberratedLatticeAveragefc3 = AberratedSWAveragefc3;
 AberratedLatticeAveragefc3FWHM = AberratedLatticeAveragefc3;
 AberratedLatticeconvLines = AberratedLatticeAveragefc3;
 for i = 1:length(AberratedLatticePSFDithered)
-    tempPSF = AberratedLatticePSFDithered{i,1};
+    tempPSF = AberratedLatticePSFDithered{i,1} .* PSFdet;
 
     % Srethl ratio
-    Lattice_SRatio_Focal(i,1) = tempPSF((N+1)/2,(N+1)/2,(N+1)/2);
-    Lattice_SRatio_Focal_FWHM(i,1) = tempPSF((N+1)/2,(N+1)/2,LatticeyFWHM2);
-    Lattice_SRatio_yz(i,1) = max(squeeze(tempPSF(:,(N+1)/2,:)),[],'all'); % yz excitation  
-
-    tempyzPSF = squeeze(tempPSF(:,(N+1)/2,:));
-    [~,col] = find(tempyzPSF==max(max(tempyzPSF)));
-    Lattice_SRatio_yz_overall(i,1) = max( PSFdet(:,(N+1)/2,(N+1)/2) .* tempyzPSF(:,col) ); % yz overall 
-
-    Lattice_SRatio_3D(i,1) = max(tempPSF,[],'all');
+    Lattice_SRatio_FocalOverall(i,1) = max(tempPSF(:,:,(N+1)/2),[],'all');
 
     % FC3 
     [AberratedLatticeAveragefc3{i,1},AberratedLatticeAveragefc3FWHM{i,1},~,~] = RunFC3(tempPSF,PSFdet,LatticeOTFmask,Iter,SNR,LatticeyFWHM2);
 
     % line grating
-    [AberratedLatticeconvLines{i,1},~,~,~] = ConvRes(tempPSF,PSFdet);
+    [AberratedLatticeconvLines{i,1},~,~,~] = ConvRes(tempPSF,PSFdet,SNR);
 end
-save([ LLSDatasavingdir '/Lattice_SRatio_Focal.mat'], 'Lattice_SRatio_Focal')
-save([ LLSDatasavingdir '/Lattice_SRatio_FWHM.mat'], 'Lattice_SRatio_Focal_FWHM')
-save([ LLSDatasavingdir '/Lattice_SRatio_yz.mat'], 'Lattice_SRatio_yz')
-save([ LLSDatasavingdir '/Lattice_SRatio_yz_overall.mat'], 'Lattice_SRatio_yz_overall')
-save([ LLSDatasavingdir '/Lattice_SRatio_3D.mat'], 'Lattice_SRatio_3D')
+save([ LLSDatasavingdir '/Lattice_SRatio_FocalOverall.mat'], 'Lattice_SRatio_FocalOverall')
 save([ LLSDatasavingdir '/AberratedLatticeAveragefc3.mat'], 'AberratedLatticeAveragefc3')
 save([ LLSDatasavingdir '/AberratedLatticeAveragefc3FWHM.mat'], 'AberratedLatticeAveragefc3FWHM')
 save([ LLSDatasavingdir '/AberratedLatticeconvLines.mat'], 'AberratedLatticeconvLines')
@@ -381,9 +347,9 @@ mkdir(Strehlsavingdir)
 
 fig1 = figure;
     h1 = subplot(1,1,1,'Parent',fig1);
-    plot(1:length(SW_SRatio_Focal),SW_SRatio_Focal,'Parent',h1,'LineStyle','-','Marker','o');
+    plot(1:length(SW_SRatio_FocalOverall),SW_SRatio_FocalOverall,'Parent',h1,'LineStyle','-','Marker','o');
     hold on
-    plot(1:length(Lattice_SRatio_Focal),Lattice_SRatio_Focal,'Parent',h1,'LineStyle','-.','Marker','o');
+    plot(1:length(Lattice_SRatio_FocalOverall),Lattice_SRatio_FocalOverall,'Parent',h1,'LineStyle','-.','Marker','o');
     lgd = legend("iSW","LLS");
     lgd.Location = 'northoutside';
     h1.XAxis.TickValues = 1:length(RadioOrderArray);
@@ -398,48 +364,9 @@ fig1 = figure;
     print(fig1, '-dsvg', [Strehlsavingdir LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_FocalStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.SVG'],'-r300')
     print(fig1, '-dpng', [Strehlsavingdir LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_FocalStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.PNG'],'-r300')
 
-fig2 = figure;
-    h1 = subplot(1,1,1,'Parent',fig2);
-    plot(1:length(SW_SRatio_Focal_FWHM),SW_SRatio_Focal_FWHM,'Parent',h1,'LineStyle','-.','Marker','o');
-    hold on
-    plot(1:length(Lattice_SRatio_Focal_FWHM),Lattice_SRatio_Focal_FWHM,'Parent',h1,'LineStyle','-.','Marker','o');
-    % p1 = plot(1:length(SW_SRatio_Focal),SW_SRatio_Focal./Lattice_SRatio_Focal,'magenta');
-    lgd = legend("iSW","LLS");
-    lgd.Location = 'northoutside';
-    h1.XAxis.TickValues = 1:length(RadioOrderArray);
-    h1.XAxis.TickLabels = LabelArray;
-    h1.XAxis.FontSize = 6;
-    grid on
-    xlabel("Aberration Mode")
-    ylabel("Strehl Ratio")
-    title("yFWHM Plane")
-    pbaspect([5 1 1])
-    hold off
-    print(fig2, '-dsvg', [ Strehlsavingdir  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_yFWHMStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.SVG'],'-r300')
-    print(fig2, '-dpng', [ Strehlsavingdir  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_yFWHMStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.PNG'],'-r300')
-
-fig3 = figure;
-    h1 = subplot(1,1,1,'Parent',fig3);
-    plot(1:length(SW_SRatio_3D),SW_SRatio_3D,'Parent',h1,'LineStyle','-.','Marker','o');
-    hold on
-    plot(1:length(Lattice_SRatio_3D),Lattice_SRatio_3D,'Parent',h1,'LineStyle','-.','Marker','o');
-    lgd = legend("iSW","LLS");
-    lgd.Location = 'northoutside';
-    h1.XAxis.TickValues = 1:length(RadioOrderArray);
-    h1.XAxis.TickLabels = LabelArray;
-    h1.XAxis.FontSize = 6;
-    grid on
-    xlabel("Aberration Mode")
-    ylabel("Strehl Ratio")
-    title("3D Excitation")
-    pbaspect([5 1 1])
-    hold off
-    print(fig3, '-dsvg', [ Strehlsavingdir   LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_3DStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.SVG'],'-r300')
-    print(fig3, '-dpng', [ Strehlsavingdir  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_3DStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.PNG'],'-r300')
-
 fig4 = figure;
     h1 = subplot(1,1,1,'Parent',fig4);
-    plot(1:length(SW_SRatio_Focal),SW_SRatio_Focal,'Parent',h1,'LineStyle','-.','Marker','o');
+    plot(1:length(SW_SRatio_FocalOverall),SW_SRatio_FocalOverall,'Parent',h1,'LineStyle','-.','Marker','o');
     hold on
     plot(1:length(SW_SRatio_corrected),SW_SRatio_corrected,'Parent',h1,'LineStyle','-.','Marker','o');
     lgd = legend("Aberrated","Corrected");
@@ -455,44 +382,6 @@ fig4 = figure;
     hold off
     print(fig4, '-dsvg', [ Strehlsavingdir   LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_CorrectedStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.SVG'],'-r300')
     print(fig4, '-dpng', [ Strehlsavingdir  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_CorrectedStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.PNG'],'-r300')
-
-fig5 = figure;
-    h1 = subplot(1,1,1,'Parent',fig5);
-    plot(1:length(SW_SRatio_yz),SW_SRatio_yz,'Parent',h1,'LineStyle','-.','Marker','o');
-    hold on
-    plot(1:length(Lattice_SRatio_yz),Lattice_SRatio_yz,'Parent',h1,'LineStyle','-.','Marker','o');
-    lgd = legend("iSW","LLS");
-    lgd.Location = 'northoutside';
-    h1.XAxis.TickValues = 1:length(RadioOrderArray);
-    h1.XAxis.TickLabels = LabelArray;
-    h1.XAxis.FontSize = 6;
-    grid on
-    xlabel("Aberration Mode")
-    ylabel("Strehl Ratio")
-    title("yz Excitation")
-    pbaspect([5 1 1])
-    hold off
-    print(fig5, '-dsvg', [ Strehlsavingdir   LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_yzExcitationStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.SVG'],'-r300')
-    print(fig5, '-dpng', [ Strehlsavingdir  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_yzExcitationStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.PNG'],'-r300')
-
-fig6 = figure;
-    h1 = subplot(1,1,1,'Parent',fig6);
-    plot(1:length(SW_SRatio_yz_overall),SW_SRatio_yz_overall,'Parent',h1,'LineStyle','-.','Marker','o');
-    hold on
-    plot(1:length(Lattice_SRatio_yz_overall),Lattice_SRatio_yz_overall,'Parent',h1,'LineStyle','-.','Marker','o');
-    lgd = legend("iSW","LLS");
-    lgd.Location = 'northoutside';
-    h1.XAxis.TickValues = 1:length(RadioOrderArray);
-    h1.XAxis.TickLabels = LabelArray;
-    h1.XAxis.FontSize = 6;
-    grid on
-    xlabel("Aberration Mode")
-    ylabel("Strehl Ratio")
-    title("yz Overall")
-    pbaspect([5 1 1])
-    hold off
-    print(fig6, '-dsvg', [ Strehlsavingdir   LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_yzOverallStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.SVG'],'-r300')
-    print(fig6, '-dpng', [ Strehlsavingdir  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_yzOverallStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.PNG'],'-r300')
 close all
 
 %% Pretty plots, FC3 
@@ -777,8 +666,8 @@ for i = 1:length(RadioOrderArray)
     xlabel("z(um)")
     ylabel("um")
     hold off
-    print(fig3, '-dsvg', [ lineGratesavingdir  'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_SWweight' num2str(SWweighting) '.SVG'],'-r300')
-    print(fig3, '-dpng', [ lineGratesavingdir 'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_SWweight' num2str(SWweighting)  '.PNG'],'-r300')
+    print(fig3, '-dsvg', [ lineGratesavingdir  'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_Latticeweight' num2str(Latticeweighting) '.SVG'],'-r300')
+    print(fig3, '-dpng', [ lineGratesavingdir 'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_Latticeweight' num2str(Latticeweighting)  '.PNG'],'-r300')
 end
 close all
 

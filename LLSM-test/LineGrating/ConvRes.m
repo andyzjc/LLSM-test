@@ -1,4 +1,4 @@
-function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet)
+function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet,SNR)
     getParameters; %modify image parameter here
     CalculatePhysics;
     
@@ -26,13 +26,8 @@ function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet)
     % xzPSFOverall = xzPSFOveralldecon + poissrnd(xzPSFOveralldecon) .* 1/SNR;
     
     % interpolate overall PSF
-    rescale_factor = deltax/deltax_line;
-    up_Image_size = round(size(xzPSFOveralldecon,1) * rescale_factor);
-    Image_center = (up_Image_size+1)/2;
-    scaledxzPSFOverall = imresize(xzPSFOveralldecon,[up_Image_size,up_Image_size]);
-    scaledxzPSFOverall = scaledxzPSFOverall/max(max(scaledxzPSFOverall));
-    scaledxzPSFOverall = scaledxzPSFOverall(Image_center-(N_line+1)/2+1:Image_center+(N_line+1)/2-1,...
-                                  Image_center-(N_line+1)/2+1:Image_center+(N_line+1)/2-1);
+   scaledxzPSFOverall = imresize(scaledxzPSFOverall,[N_line,N_line]);
+   scaledxzPSFOverall = scaledxzPSFOverall + poissrnd(scaledxzPSFOverall) .* 1/SNR;
 
     % Convolution with GT lines
     convLines = conv2(GTLines,scaledxzPSFOverall','same');

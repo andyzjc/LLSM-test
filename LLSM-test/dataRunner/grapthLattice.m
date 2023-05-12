@@ -17,14 +17,14 @@ function grapthLattice(NA1,deltaNA,LatticeType,weighting,LatticePSF,LatticePSFDi
     DitheredxzOTFexc = fftshift(fft2(ifftshift(DitheredxzPSFexc))); 
     DitheredzOTFexc = DitheredxzOTFexc(:,(N+1)/2); 
 
-    DitheredxyPSFexc = squeeze(DitheredPSFexc((N+1)/2,:,:)); 
-    DitheredxyPSFexcRealDithered = zeros(size(DitheredxyPSFexc));
-    for j = -5:5
-        DitheredxyPSFexcRealDithered = DitheredxyPSFexcRealDithered + ...
-            circshift(DitheredxyPSFexc,j,1);
-    end
-    DitheredxyPSFexc = DitheredxyPSFexcRealDithered;
-    DitheredxyPSFexc = DitheredxyPSFexc/max(DitheredxyPSFexc,[],'all');
+    % DitheredxyPSFexc = squeeze(DitheredPSFexc((N+1)/2,:,:)); 
+    % DitheredxyPSFexcRealDithered = zeros(size(DitheredxyPSFexc));
+    % for j = -5:5
+    %     DitheredxyPSFexcRealDithered = DitheredxyPSFexcRealDithered + ...
+    %         circshift(DitheredxyPSFexc,j,1);
+    % end
+    % DitheredxyPSFexc = DitheredxyPSFexcRealDithered;
+    % DitheredxyPSFexc = DitheredxyPSFexc/max(DitheredxyPSFexc,[],'all');
 
     PSFexc = LatticePSF;
     xyPSFexc = squeeze(PSFexc((N+1)/2,:,:)); 
