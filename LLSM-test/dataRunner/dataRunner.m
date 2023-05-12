@@ -19,7 +19,7 @@ PSFdet = PSFdet./(max(max(max(PSFdet))));
 % zOTFdet = real(xzOTFdet(:,(N+1)/2));
 
 %% Unaberrated
-clc
+
 NA1 = 0.58;
 deltaNA = 0.04;
 LatticeType = 'hex';
