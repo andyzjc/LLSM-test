@@ -26,7 +26,7 @@ function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet,SNR)
     % xzPSFOverall = xzPSFOveralldecon + poissrnd(xzPSFOveralldecon) .* 1/SNR;
     
     % interpolate overall PSF
-   scaledxzPSFOverall = imresize(scaledxzPSFOverall,[N_line,N_line]);
+   scaledxzPSFOverall = imresize(xzPSFOveralldecon,[N_line,N_line]);
    scaledxzPSFOverall = scaledxzPSFOverall + poissrnd(scaledxzPSFOverall) .* 1/SNR;
 
     % Convolution with GT lines
