@@ -316,7 +316,7 @@ mkdir(Pupilsavingdir)
 counter = 1;
 for i = 1:length(RadioOrderArray)
     phase = zeros(size(kx_exc));
-    phase(idx) = zernfun(RadioOrderArray(i),AngularFrequency(i),r(idx),theta(idx),'norm');
+    phase(idx) = zernfun(RadioOrderArray(i),AngularFrequencyArray(i),r(idx),theta(idx),'norm');
     
     fig1 = figure;
     imagesc(KX_exc,KZ_exc,PhaseAmplitude*phase/2/pi)
@@ -607,6 +607,7 @@ mkdir(lineGratesavingdir)
 
 for i = 1:length(RadioOrderArray)
     AberratedlinGratingsaving = [lineGratesavingdir  'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '/'];
+    mkdir(AberratedlinGratingsaving)
     fig1 = figure;
     temp1 = AberratedSWconvLines{i,1};
     temp2 = AberratedLatticeconvLines{i,1};
@@ -634,7 +635,7 @@ for i = 1:length(RadioOrderArray)
     xline(Line_Z(lineSpot),'k','LineWidth',1)
     xlim([0,20])
     ylim([0,20])
-    clim([0,100])
+    clim([0,20])
     colorbar
     title("Spacing increment=220+" + num2str(30) + "nm")
     xlabel("z(um)")
@@ -650,7 +651,7 @@ for i = 1:length(RadioOrderArray)
     xline(Line_Z(lineSpot),'k','LineWidth',1)
     xlim([0,20])
     ylim([0,20])
-    clim([0,100])
+    clim([0,20])
     colorbar
     title("Spacing increment=220+" + num2str(30) + "nm")
     xlabel("z(um)")
