@@ -619,7 +619,7 @@ for i = 1:length(RadioOrderArray)
     xline(Line_Z(lineSpot),'k')
     xlim([0,20])
     legend("iSW","LLS","aberrated iSW","aberrated LLS")
-    title("Spacing increment=220+" + num2str(30) + "nm")
+    title("Spacing increment=220+" + num2str(20) + "nm")
     xlabel("z(um)")
     ylabel("Intensity (a.u)")
     hold off 
@@ -637,7 +637,7 @@ for i = 1:length(RadioOrderArray)
     ylim([0,20])
     clim([0,20])
     colorbar
-    title("Spacing increment=220+" + num2str(30) + "nm")
+    title("Spacing increment=220+" + num2str(20) + "nm")
     xlabel("z(um)")
     ylabel("um")
     hold off
@@ -653,14 +653,15 @@ for i = 1:length(RadioOrderArray)
     ylim([0,20])
     clim([0,20])
     colorbar
-    title("Spacing increment=220+" + num2str(30) + "nm")
+    title("Spacing increment=220+" + num2str(20) + "nm")
     xlabel("z(um)")
     ylabel("um")
     hold off
     print(fig3, '-dsvg', [ lineGratesavingdir  'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_Latticeweight' num2str(Latticeweighting) '.SVG'],'-r300')
     print(fig3, '-dpng', [ lineGratesavingdir 'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_Latticeweight' num2str(Latticeweighting)  '.PNG'],'-r300')
-end
 close all
+end
+
 
 %%
 % figure
