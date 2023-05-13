@@ -31,6 +31,7 @@ function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet,SNR)
 
     % Convolution with GT lines
     convLines = conv2(GTLines,scaledxzPSFOverall','same');
+    convLines = convLines + poissrnd(convLines) .* 1/SNR;
     % convLines = convLines/max(max(convLines));
 
     % deconvlution 
