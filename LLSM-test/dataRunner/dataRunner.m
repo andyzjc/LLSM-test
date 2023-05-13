@@ -641,8 +641,8 @@ for i = 1:length(RadioOrderArray)
     xlabel("z(um)")
     ylabel("um")
     hold off
-    print(fig2, '-dsvg', [ lineGratesavingdir  'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_SWLineGratingFullImage_SWweight' num2str(SWweighting) '.SVG'],'-r300')
-    print(fig2, '-dpng', [ lineGratesavingdir 'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_SWLineGratingFullImage_SWweight' num2str(SWweighting)  '.PNG'],'-r300')
+    print(fig2, '-dsvg', [ AberratedlinGratingsaving  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_SWLineGratingFullImage_SWweight' num2str(SWweighting) '.SVG'],'-r300')
+    print(fig2, '-dpng', [ AberratedlinGratingsaving  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_SWLineGratingFullImage_SWweight' num2str(SWweighting)  '.PNG'],'-r300')
     
     fig3 = figure;
     imagesc(Line_Z,Line_Z,temp2)
@@ -657,8 +657,8 @@ for i = 1:length(RadioOrderArray)
     xlabel("z(um)")
     ylabel("um")
     hold off
-    print(fig3, '-dsvg', [ lineGratesavingdir  'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_Latticeweight' num2str(Latticeweighting) '.SVG'],'-r300')
-    print(fig3, '-dpng', [ lineGratesavingdir 'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_Latticeweight' num2str(Latticeweighting)  '.PNG'],'-r300')
+    print(fig3, '-dsvg', [ AberratedlinGratingsaving  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_Latticeweight' num2str(Latticeweighting) '.SVG'],'-r300')
+    print(fig3, '-dpng', [ AberratedlinGratingsaving  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_LatticeLineGratingFullImage_Latticeweight' num2str(Latticeweighting)  '.PNG'],'-r300')
 close all
 end
 
