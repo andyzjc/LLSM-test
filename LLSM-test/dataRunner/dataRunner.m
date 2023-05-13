@@ -611,16 +611,17 @@ for i = 1:length(RadioOrderArray)
     fig1 = figure;
     temp1 = AberratedSWconvLines{i,1};
     temp2 = AberratedLatticeconvLines{i,1};
-    plot(Line_Z,SWconvLines((N+1)/2,:),'magenta','LineWidth',2)
+    %plot(Line_Z,SWconvLines((N+1)/2,:),'magenta','LineWidth',0.5)
     hold on
-    plot(Line_Z,LatticeconvLines((N+1)/2,:),'Color','b','LineWidth',2,'LineStyle','-.')
-    plot(Line_Z,temp1((N+1)/2,:),'Color',[0.4660 0.6740 0.1880],'LineWidth',2)
-    plot(Line_Z,temp2((N+1)/2,:),'Color',[0.8500 0.3250 0.0980],'LineStyle','-.','LineWidth',2)
+    %plot(Line_Z,LatticeconvLines((N+1)/2,:),'Color','b','LineWidth',0.5,'LineStyle','-.')
+    plot(Line_Z,temp1((N+1)/2,:),'Color',[0.4660 0.6740 0.1880],'LineWidth',0.5)
+    plot(Line_Z,temp2((N+1)/2,:),'Color',[0.8500 0.3250 0.0980],'LineStyle','-.','LineWidth',0.5)
     xline(Line_Z(lineSpot),'k')
     xlim([0,20])
-    legend("iSW","LLS","aberrated iSW","aberrated LLS")
+    ylim([0,15])
+    legend("aberrated iSW","aberrated LLS")
     title("Spacing increment=220+" + num2str(20) + "nm")
-    xlabel("z(um)")
+    xlabel("z(lambda/n)")
     ylabel("Intensity (a.u)")
     hold off 
     grid on
