@@ -195,8 +195,7 @@ counter = 1;
 for i = MinRadialOrder:MaxRadialOrder
     AngularFrequency = -i:2:i;
     for k = 1:length(AngularFrequency)
-        % RadioOrderArray(counter) = i;
-        % AngularFrequencyArray(counter) = AngularFrequency(k);
+       
         phase = zeros(size(kx_exc));
         phase(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx),'norm');
 
@@ -233,8 +232,7 @@ counter = 1;
 for i = MinRadialOrder:MaxRadialOrder
     AngularFrequency = -i:2:i;
     for k = 1:length(AngularFrequency)
-        RadioOrderArray(counter) = i;
-        AngularFrequencyArray(counter) = AngularFrequency(k);
+        
         phase = zeros(size(kx_exc));
         phase(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx),'norm');
         % %Lattice
@@ -316,7 +314,7 @@ mkdir(Analysis_savingdir)
 Pupilsavingdir = [Analysis_savingdir 'PupilError/'];
 mkdir(Pupilsavingdir)
 counter = 1;
-for i = MinRadialOrder:MaxRadialOrder
+for i = 1:length(RadioOrderArray)
     phase = zeros(size(kx_exc));
     phase(idx) = zernfun(RadioOrderArray(i),AngularFrequency(i),r(idx),theta(idx),'norm');
     
