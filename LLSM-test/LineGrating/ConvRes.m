@@ -7,7 +7,7 @@ function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet,SNR)
     %             7.9254,8.7326,9.5765,10.4571,14.0896]; %um 
     N_line = 1025;
     deltax_line = 0.02; %um
-    Spacing = 0.16:0.02:0.9; % um
+    Spacing = 0.2:0.02:0.9; % um
     lineSpot = zeros(1,length(Spacing)+1);
     lineSpot(1,1) = 1;
     for i = 1:length(Spacing)
@@ -41,6 +41,7 @@ function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet,SNR)
     convLines = convLines + poissrnd(convLines) .* 1/SNR;
     % convLines = convLines/max(max(convLines));
 
+    imagesc(convLines);
     % deconvlution 
     % DeconvLines = deconvlucy(convLines,xzPSFOveralldecon,deconIter);
     % DeconvLines = DeconvLines/max(max(DeconvLines));

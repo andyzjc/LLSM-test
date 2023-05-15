@@ -82,7 +82,7 @@ elseif isequal(LatticeType,'1dgaussian')
     0,NA1,...
     SWweighting);
 
-    LatticePupil = load('LLSM-test/Aberration/Zernike/1dGaussianPupil513_NA_0p26.mat');
+    LatticePupil = load('LLSM-test/Aberration/Zernike/1dGaussianPupil513_NA_0p6.mat');
     LatticePupil = LatticePupil.GaussianPupil;
 elseif isequal(LatticeType,'2dgaussian')
     [SWPupil,~,~] = GetSWPairPupil('gaussian',0,0,...
@@ -618,9 +618,9 @@ for i = 1:length(RadioOrderArray)
     plot(Line_Z,temp2((N+1)/2,:),'Color',[0.8500 0.3250 0.0980],'LineStyle','-.','LineWidth',0.5)
     xline(Line_Z(lineSpot),'k')
     xlim([0,50])
-    ylim([0,100])
+    ylim([0,50])
     legend("pSW","LLS","aberrated iSW","aberrated LLS")
-    title("Spacing increment=220+" + num2str(20) + "nm")
+    title("Spacing increment=20+" + num2str(20) + "nm")
     xlabel("z(lambda/n)")
     ylabel("Intensity (a.u)")
     hold off 
@@ -636,9 +636,9 @@ for i = 1:length(RadioOrderArray)
     xline(Line_Z(lineSpot),'k','LineWidth',1)
     xlim([0,50])
     ylim([0,20])
-    clim([0,80])
+    clim([0,50])
     colorbar
-    title("Spacing increment=220+" + num2str(20) + "nm")
+    title("Spacing increment=200+" + num2str(20) + "nm")
     xlabel("z(um)")
     ylabel("um")
     hold off
@@ -652,9 +652,9 @@ for i = 1:length(RadioOrderArray)
     xline(Line_Z(lineSpot),'k','LineWidth',1)
     xlim([0,50])
     ylim([0,20])
-    clim([0,80])
+    clim([0,50])
     colorbar
-    title("Spacing increment=220+" + num2str(20) + "nm")
+    title("Spacing increment=200+" + num2str(20) + "nm")
     xlabel("z(um)")
     ylabel("um")
     hold off
