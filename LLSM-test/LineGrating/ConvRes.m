@@ -41,7 +41,6 @@ function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet,SNR)
     convLines = convLines + poissrnd(convLines) .* 1/SNR;
     % convLines = convLines/max(max(convLines));
 
-    imagesc(convLines);
     % deconvlution 
     % DeconvLines = deconvlucy(convLines,xzPSFOveralldecon,deconIter);
     % DeconvLines = DeconvLines/max(max(DeconvLines));
