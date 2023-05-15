@@ -24,8 +24,8 @@ NA1 = 0.58;
 deltaNA = 0.04;
 LatticeType = 'hex';
 ProfileType = 'tophat';
-SWweighting = 4/3; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
-Latticeweighting = 1.9; % 1.9 for V2 LLS
+SWweighting = 7/10; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
+Latticeweighting = 1; % 1.9 for V2 LLS
 SNR = 10;
 Iter = 10;
 OTFthreshold = 0.001;
@@ -267,7 +267,7 @@ for i = 1:length(AberratedPSFIncoherent)
     tempSWcenter = AberratedSWcenter{i,1};
 
     % Srethl ratio
-    SW_SRatio_FocalOverall(i,1) = max(tempPSF(:,:,(N+1)/2).*tempPSF(:,:,(N+1)/2),[],'all'); % focal point, excitation
+    SW_SRatio_FocalOverall(i,1) = max(tempPSF(:,:,(N+1)/2).*PSFdet(:,:,(N+1)/2),[],'all'); % focal point, excitation
    
     % aberration correction (quick guess) 
     SW_SRatio_corrected(i,1) = (tempSWcenter(3,1) + tempSWcenter(4,1))/SWcenter(2,1);

@@ -1,4 +1,4 @@
-function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Strehl(SWPupil,LatticePupil,MinRadialOrder,MaxRadialOrder,PhaseAmplitude,savingdir)
+function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Strehl(SWPupil,LatticePupil,MinRadialOrder,MaxRadialOrder,PhaseAmplitude,PSFdet)
     getParameters; %modify image parameter here
     CalculatePhysics;
 
@@ -23,8 +23,9 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
     for i = MinRadialOrder:MaxRadialOrder
         AngularFrequency = -i:2:i;
         for k = 1:length(AngularFrequency)
-            RadioOrderArray(counter) = i;
+            RadioOrderArray(1,counter) = i;
             AngularFrequencyArray(counter) = AngularFrequency(k);
+            
             phase = zeros(size(kx_exc));
             phase(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx),'norm');
     
@@ -34,28 +35,40 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
             for j = 1:size(SWPupil,3)
                 PupilIter = SWPupil(:,:,j);
                 AberratedSWPupil(idx) = PupilIter(idx) .* exp(PhaseAmplitude.* 1i.*phase(idx));
-                AberratedSWPSF = AberratedSWPSF + abs(fftshift(ifft2(fftshift(AberratedSWPupil)))).^2;
+                temp = abs(fftshift(ifft2(fftshift(AberratedSWPupil)))).^2;
+                AberratedSWPSF = AberratedSWPSF + temp;
             end
             AberratedSWPSF = AberratedSWPSF./SWvalue; 
-            SW_SRatio(counter,1) = AberratedSWPSF((N+1)/2,(N+1)/2); % only at focal point/ on optical axis
+            SW_SRatio(counter,1) = max(AberratedSWPSF.*PSFdet(:,:,(N+1)/2),[],'all'); % only at focal point/ on optical axis
 
             AberratedLatticePupil = zeros(size(phase));
-            AberratedLatticePSF = zeros(size(phase));
             AberratedLatticePupil(idx) = LatticePupil(idx) .* exp(PhaseAmplitude.* 1i.*phase(idx));
             AberratedLatticePSF = abs(fftshift(ifft2(fftshift(AberratedLatticePupil)))).^2;
             AberratedLatticePSF = meshgrid(mean(AberratedLatticePSF,2))';
             AberratedLatticePSF = AberratedLatticePSF/Latticevalue;
-            Lattice_SRatio(counter,1) = AberratedLatticePSF((N+1)/2,(N+1)/2);
+            Lattice_SRatio(counter,1) = max(AberratedLatticePSF.*PSFdet(:,:,(N+1)/2),[],'all');
             counter = counter + 1;
         end
     end
 
+    LabelArray = cell(length(RadioOrderArray),1);
+    for i = 1:length(RadioOrderArray)
+        LabelArray{i,1} = "Z^{" + num2str(AngularFrequencyArray(i)) + "}_{" + num2str(RadioOrderArray(i)) + "}";
+    end
+
     fig1 = figure;
     h1 = subplot(1,1,1,'Parent',fig1);
-    b1 = bar(1:length(SW_SRatio),[SW_SRatio,Lattice_SRatio],0.5,'Parent',h1);
-    lgd = legend(b1,"iSW","LLS");
+    plot(1:length(SW_SRatio),SW_SRatio,'Parent',h1,'LineStyle','-','Marker','o');
+    hold on
+    plot(1:length(Lattice_SRatio),Lattice_SRatio,'Parent',h1,'LineStyle','-.','Marker','o');
+    lgd = legend("iSW","LLS");
+    lgd.Location = 'northoutside';
     h1.XAxis.TickValues = 1:length(RadioOrderArray);
-    LabelArray = [RadioOrderArray;AngularFrequencyArray];
-    tickLabels = strtrim(sprintf('%d\\newline%d\n', LabelArray(:)));
-    h1.XAxis.TickLabels = tickLabels;
+    h1.XAxis.TickLabels = LabelArray;
+    h1.XAxis.FontSize = 6;
     grid on
+    xlabel("Aberration Mode")
+    ylabel("Strehl Ratio")
+    title("Focal Plane")
+    pbaspect([5 1 1])
+    hold off
