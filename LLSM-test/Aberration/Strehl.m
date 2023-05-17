@@ -2,9 +2,6 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
     getParameters; %modify image parameter here
     CalculatePhysics;
 
-    [theta,r] = cart2pol(kx_exc./(0.65./n*k_wave),kz_exc./(0.65./n*k_wave));
-    idx = r<=1;
-
     SWPSF = zeros(N,N);
     for j = 1:size(SWPupil,3)
         PupilIter = SWPupil(:,:,j);
@@ -26,15 +23,13 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
             RadioOrderArray(1,counter) = i;
             AngularFrequencyArray(counter) = AngularFrequency(k);
             
-            phase = zeros(size(kx_exc));
-            phase(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx),'norm');
+            [ComplexPhase,phase] = GetSingleZmodePupil(i,AngularFrequency(k),PhaseAmplitude);
     
-            AberratedSWPupil = zeros(size(phase));
             AberratedSWPSF = zeros(size(phase));
             %SW 
             for j = 1:size(SWPupil,3)
                 PupilIter = SWPupil(:,:,j);
-                AberratedSWPupil(idx) = PupilIter(idx) .* exp(PhaseAmplitude.* 1i.*phase(idx));
+                AberratedSWPupil = PupilIter .* ComplexPhase;
                 temp = abs(fftshift(ifft2(fftshift(AberratedSWPupil)))).^2;
                 AberratedSWPSF = AberratedSWPSF + temp;
             end
@@ -42,7 +37,7 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
             SW_SRatio(counter,1) = max(AberratedSWPSF.*PSFdet(:,:,(N+1)/2),[],'all'); % only at focal point/ on optical axis
 
             AberratedLatticePupil = zeros(size(phase));
-            AberratedLatticePupil(idx) = LatticePupil(idx) .* exp(PhaseAmplitude.* 1i.*phase(idx));
+            AberratedLatticePupil = LatticePupil .* exp( 1i.*phase);
             AberratedLatticePSF = abs(fftshift(ifft2(fftshift(AberratedLatticePupil)))).^2;
             AberratedLatticePSF = meshgrid(mean(AberratedLatticePSF,2))';
             AberratedLatticePSF = AberratedLatticePSF/Latticevalue;
@@ -58,9 +53,9 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
 
     fig1 = figure;
     h1 = subplot(1,1,1,'Parent',fig1);
-    plot(1:length(SW_SRatio),SW_SRatio,'Parent',h1,'LineStyle','-','Marker','o');
+    plot(1:length(SW_SRatio),SW_SRatio,'Parent',h1,'LineStyle','-','Marker','o','MarkerSize',15);
     hold on
-    plot(1:length(Lattice_SRatio),Lattice_SRatio,'Parent',h1,'LineStyle','-.','Marker','o');
+    plot(1:length(Lattice_SRatio),Lattice_SRatio,'Parent',h1,'LineStyle','-.','Marker','o','MarkerSize',15);
     lgd = legend("iSW","LLS");
     lgd.Location = 'northoutside';
     h1.XAxis.TickValues = 1:length(RadioOrderArray);

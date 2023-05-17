@@ -162,7 +162,7 @@ idx = r<=1;
 
 MinRadialOrder = 0;
 MaxRadialOrder = 6;
-PhaseAmplitude = 6; 
+PhaseAmplitude = 6*wavelength_exc/(2*pi); 
 
 RadioOrderArray = [];
 AngularFrequencyArray =[];
@@ -195,18 +195,15 @@ counter = 1;
 for i = MinRadialOrder:MaxRadialOrder
     AngularFrequency = -i:2:i;
     for k = 1:length(AngularFrequency)
-       
-        phase = zeros(size(kx_exc));
-        phase(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx),'norm');
+        [ComplexPhase,phase] = GetSingleZmodePupil(i,AngularFrequency(k),PhaseAmplitude);
 
-        %SW 
         AberratedPupil1 = zeros(size(phase));
         AberratedPupil2 = zeros(size(phase));
         SWPupil1 = squeeze(SWPupil(:,:,1));
         SWPupil2 = squeeze(SWPupil(:,:,2));
 
-        AberratedPupil1(idx) = SWPupil1(idx) .* exp(PhaseAmplitude.* 1i.*phase(idx));
-        AberratedPupil2(idx) = SWPupil2(idx) .* exp(PhaseAmplitude.* 1i.*phase(idx));
+        AberratedPupil1(idx) = SWPupil1(idx) .* ComplexPhase;
+        AberratedPupil2(idx) = SWPupil2(idx) .* ComplexPhase;
         temp1(:,:,1) = AberratedPupil1;
         temp1(:,:,2) = AberratedPupil2;
         [temp3,temp4,temp5] = SimulateSWPair(temp1);
@@ -232,12 +229,11 @@ counter = 1;
 for i = MinRadialOrder:MaxRadialOrder
     AngularFrequency = -i:2:i;
     for k = 1:length(AngularFrequency)
-        
-        phase = zeros(size(kx_exc));
-        phase(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx),'norm');
+        [ComplexPhase,phase] = GetSingleZmodePupil(i,AngularFrequency(k),PhaseAmplitude);
+
         % %Lattice
         temp2 = zeros(size(phase));
-        temp2(idx) = LatticePupil(idx) .* exp(PhaseAmplitude.* 1i .*phase(idx));
+        temp2 = LatticePupil .* ComplexPhase;
         [temp6,temp7,temp8] = SimulateLattice(temp2);
         AberratedLatticePupil{counter,1} = temp2;
         %AberratedLatticePSF{counter,1} = temp6/Latticecenter(1,1);
@@ -284,12 +280,11 @@ save([SWDatasavingdir '/SW_SRatio_FocalOverall.mat'],'SW_SRatio_FocalOverall')
 save([SWDatasavingdir '/AberratedSWconvLines.mat'],'AberratedSWconvLines')
 
 Lattice_SRatio_FocalOverall = zeros(size(AberratedLatticePSFDithered));
-
 AberratedLatticeAveragefc3 = AberratedSWAveragefc3;
 AberratedLatticeAveragefc3FWHM = AberratedLatticeAveragefc3;
 AberratedLatticeconvLines = AberratedLatticeAveragefc3;
 for i = 1:length(AberratedLatticePSFDithered)
-    tempPSF = AberratedLatticePSFDithered{i,1} ;
+    tempPSF = AberratedLatticePSFDithered{i,1};
 
     % Srethl ratio
     Lattice_SRatio_FocalOverall(i,1) = max(tempPSF(:,:,(N+1)/2).* PSFdet(:,:,(N+1)/2),[],'all');
@@ -315,15 +310,14 @@ Pupilsavingdir = [Analysis_savingdir 'PupilError/'];
 mkdir(Pupilsavingdir)
 counter = 1;
 for i = 1:length(RadioOrderArray)
-    phase = zeros(size(kx_exc));
-    phase(idx) = zernfun(RadioOrderArray(i),AngularFrequencyArray(i),r(idx),theta(idx),'norm');
-    
+    [ComplexPhase,phase] = GetSingleZmodePupil(RadioOrderArray(i),AngularFrequencyArray(i),PhaseAmplitude);
     fig1 = figure;
-    imagesc(KX_exc,KZ_exc,PhaseAmplitude*phase/2/pi)
+    imagesc(KX_exc,KZ_exc,phase/2/pi)
+    axis image
     xlim([-0.5,0.5])
     ylim([-0.5,0.5])
-    title("0.65NA")
-    colormap(jet)
+    title("0.65NA,Unit:lambda/n")
+    colormap(turbo)
     colorbar
     print(fig1, '-dsvg', [ Pupilsavingdir  'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '_WFE_Amplitude_' num2str(PhaseAmplitude) '.SVG'],'-r300')
     print(fig1, '-dpng', [ Pupilsavingdir 'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '__WFE_Amplitude_' num2str(PhaseAmplitude) '.PNG'],'-r300')
@@ -373,6 +367,56 @@ fig4 = figure;
     print(fig4, '-dpng', [ Strehlsavingdir  LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_CorrectedStrehl_SWweight' num2str(SWweighting) '_LLSweight' num2str(Latticeweighting) '.PNG'],'-r300')
 close all
 
+%% Pretty plots, Beads for FC3
+Beadssavingdir = [Analysis_savingdir 'BeadsImage/'];
+mkdir(Beadssavingdir)
+
+GTBeads = load('/Users/andyzjc/Dropbox (Princeton)/Tian-Ming for Andy/Manuscripts/Adaptive Polarization Controlled Incoherent SW Light Sheet/Figures/Figure 5/hex_0.58_0.04_tophat_V1/AberrationAnalysis/BeadsImage/GroundTruth.mat');
+Beads = GTBeads.GTallbeads;
+Vol = zeros(N,N,N);
+Vol(:,:,(N+1)/2) = Beads;
+
+for i = 1:length(RadioOrderArray)
+    AberratedBeadsaving = [Beadssavingdir  'Z_' num2str(RadioOrderArray(i)) '_' num2str(AngularFrequencyArray(i)) '/'];
+    mkdir(AberratedBeadsaving)
+
+    tempPSF1 = AberratedPSFIncoherent{i,1};
+    tempPSF2 = AberratedLatticePSFDithered{i,1};
+
+    SWPSFoverall = tempPSF1.* PSFdet;
+    fftvol = fftshift(fftn(ifftshift(Vol))) .* fftshift(fftn(ifftshift(SWPSFoverall)));
+    temp = abs(fftshift(ifftn(ifftshift(fftvol))));
+    SWBeadsVol = temp + poissrnd(temp) .* 1/SNR;
+
+    LatticePSFoverall = tempPSF2.* PSFdet;
+    fftvol = fftshift(fftn(ifftshift(Vol))) .* fftshift(fftn(ifftshift(LatticePSFoverall)));
+    temp = abs(fftshift(ifftn(ifftshift(fftvol))));
+    LatticeBeadsVol = temp + poissrnd(temp) .* 1/SNR;
+
+
+    fig1 = figure;
+    imagesc(Z_exc,X_exc,SWBeadsVol(:,:,(N+1)/2))
+    axis image
+    xlim([-40,40])
+    ylim([-40,40])
+    colormap(hot)
+    colorbar
+    print(fig1, '-dsvg', [ AberratedBeadsaving '_SWBeads_' num2str(PhaseAmplitude) '.SVG'],'-r300')
+    print(fig1, '-dpng', [ AberratedBeadsaving '_SWBeads_' num2str(PhaseAmplitude) '.PNG'],'-r300')
+
+    fig2 = figure;
+    imagesc(Z_exc,X_exc,LatticeBeadsVol(:,:,(N+1)/2))
+    axis image
+    xlim([-40,40])
+    ylim([-40,40])
+    colormap(hot)
+    colorbar
+    print(fig2, '-dsvg', [ AberratedBeadsaving  '_LatticeBeads_' num2str(PhaseAmplitude) '.SVG'],'-r300')
+    print(fig2, '-dpng', [ AberratedBeadsaving  '_LatticeBeads_' num2str(PhaseAmplitude) '.PNG'],'-r300')
+
+end
+close all
+
 %% Pretty plots, FC3 
 % clc
 % SWFC3savingdir = [Analysis_savingdir 'FC3/iSW/'];
@@ -384,7 +428,8 @@ close all
 %     title("Unaberrated")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -395,7 +440,8 @@ close all
 %     title("Aberrated")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -407,7 +453,8 @@ close all
 %     title("Unaberrated/Aberrated")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,hot(256))
+%     % colormap(h1,hot(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,10])
 %     set(gca,'YDir','normal')
@@ -418,7 +465,8 @@ close all
 %     title("yFWHM")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -428,7 +476,8 @@ close all
 %     imagesc(KX_exc((N+1)/2:N),KZ_exc((N+1)/2:N),AberratedSWAveragefc3FWHM{i,1})
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -439,7 +488,8 @@ close all
 %     imagesc(KX_exc((N+1)/2:N),KZ_exc((N+1)/2:N),Ratiomap)
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,hot(256))
+%     % colormap(h1,hot(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,10])
 %     set(gca,'YDir','normal')
@@ -459,7 +509,8 @@ close all
 %     title("Unaberrated")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -470,7 +521,8 @@ close all
 %     title("Aberrated")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -482,7 +534,8 @@ close all
 %     title("Unaberrated/Aberrated")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,hot(256))
+%     % colormap(h1,hot(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,10])
 %     set(gca,'YDir','normal')
@@ -493,7 +546,8 @@ close all
 %     title("yFWHM")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -503,7 +557,8 @@ close all
 %     imagesc(KX_exc((N+1)/2:N),KZ_exc((N+1)/2:N),AberratedLatticeAveragefc3FWHM{i,1})
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -514,7 +569,8 @@ close all
 %     imagesc(KX_exc((N+1)/2:N),KZ_exc((N+1)/2:N),Ratiomap)
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,hot(256))
+%     % colormap(h1,hot(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,10])
 %     set(gca,'YDir','normal')
@@ -534,7 +590,8 @@ close all
 %     title("SW")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -545,7 +602,8 @@ close all
 %     title("LLS")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -557,7 +615,8 @@ close all
 %     title("SW/LLS")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,hot(256))
+%     % colormap(h1,hot(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,10])
 %     set(gca,'YDir','normal')
@@ -568,7 +627,8 @@ close all
 %     title("yFWHM")
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -578,7 +638,8 @@ close all
 %     imagesc(KX_exc((N+1)/2:N),KZ_exc((N+1)/2:N),AberratedLatticeAveragefc3{i,1})
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,fire(256))
+%     % colormap(h1,fire(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,1])
 %     set(gca,'YDir','normal')
@@ -589,7 +650,8 @@ close all
 %     imagesc(KX_exc((N+1)/2:N),KZ_exc((N+1)/2:N),Ratiomap)
 %     xlabel("k_r/(4\pin/\lambda_{exc})")
 %     ylabel("k_z/(4\pin/\lambda_{exc})")
-%     colormap(h1,hot(256))
+%     % colormap(h1,hot(256))
+%     colormap(h1,turbo)
 %     colorbar
 %     clim([0,10])
 %     set(gca,'YDir','normal')
