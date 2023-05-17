@@ -269,10 +269,10 @@ print(fig3, '-dsvg', [  savingdir 'FC3' '.SVG'],'-r300')
 print(fig3, '-dpng', [  savingdir 'FC3' '.PNG'],'-r300')
 
 fig4 = figure;
-    plot(Line_Z,AberratedSWconvLines((N+1)/2,:),'Color',[0.4660 0.6740 0.1880],'LineWidth',0.5)
+    plot(LineZ,AberratedSWconvLines((N+1)/2,:),'Color',[0.4660 0.6740 0.1880],'LineWidth',0.5)
     hold on
-    plot(Line_Z,AberratedLatticeconvLines((N+1)/2,:),'Color',[0.8500 0.3250 0.0980],'LineStyle','-.','LineWidth',0.5)
-    xline(Line_Z(lineSpot),'k')
+    plot(LineZ,AberratedLatticeconvLines((N+1)/2,:),'Color',[0.8500 0.3250 0.0980],'LineStyle','-.','LineWidth',0.5)
+    xline(LineZ(lineSpot),'k')
     xlim([0,50])
     ylim([0,50])
     legend("aberrated pSW","aberrated LLS")
@@ -287,10 +287,10 @@ print(fig4, '-dsvg', [  savingdir 'LineGrating' '.SVG'],'-r300')
 print(fig4, '-dpng', [  savingdir 'LineGrating' '.PNG'],'-r300')
 
 fig5 = figure;
-    imagesc(Line_Z,Line_Z,AberratedSWconvLines)
+    imagesc(LineZ,LineZ,AberratedSWconvLines)
     colormap(hot)
     hold on
-    xline(Line_Z(lineSpot),'k','LineWidth',1)
+    xline(LineZ(lineSpot),'k','LineWidth',1)
     xlim([0,50])
     ylim([0,20])
     clim([0,50])
@@ -303,10 +303,10 @@ print(fig5, '-dsvg', [  savingdir 'SWLines' '.SVG'],'-r300')
 print(fig5, '-dpng', [  savingdir 'SWLines' '.PNG'],'-r300')    
     
 fig6 = figure;
-    imagesc(Line_Z,Line_Z,AberratedLatticeconvLines)
+    imagesc(LineZ,LineZ,AberratedLatticeconvLines)
     colormap(hot)
     hold on
-    xline(Line_Z(lineSpot),'k','LineWidth',1)
+    xline(LineZ(lineSpot),'k','LineWidth',1)
     xlim([0,50])
     ylim([0,20])
     clim([0,50])
@@ -317,3 +317,4 @@ fig6 = figure;
     hold off
 print(fig5, '-dsvg', [  savingdir 'LLSLines' '.SVG'],'-r300')
 print(fig5, '-dpng', [  savingdir 'LLSLines' '.PNG'],'-r300')  
+close all

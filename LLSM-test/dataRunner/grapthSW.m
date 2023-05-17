@@ -253,7 +253,7 @@ function grapthSW(NA1,deltaNA,LatticeType,weighting,PSFIncoherent,PSFCoherent,SW
     colorbar
     clim([0,1])
     hold on
-    plot(xzPSFoverall(:,(N+1)/2)*10-10,Z_exc,'LineWidth',1,'Color','g')
+    plot(xzPSFoverall(:,(N+1)/2)*Sampleoffset-Sampleoffset,Z_exc,'LineWidth',1,'Color','g')
     print(fig8, '-dsvg', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_xzPSF_overall_weighting_' num2str(weighting) '.SVG'],'-r300')
     print(fig8, '-dpng', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_xzPSF_overall_weighting_' num2str(weighting) '.PNG'],'-r300')
 
