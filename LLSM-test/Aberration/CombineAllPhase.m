@@ -196,6 +196,8 @@ SRatioLattice = max(OverallAberratedLatticePSFDithered(:,:,(N+1)/2),[],'all');
 [AberratedSWAveragefc3,AberratedSWAveragefc3FWHM,~,~] = RunFC3(AberratedPSFIncoherent,PSFdet,SWOTFmask,Iter,SNR,SWyFWHM2);
 [AberratedLatticeAveragefc3,AberratedLatticeAveragefc3FWHM,~,~] = RunFC3(AberratedLatticePSFDithered,PSFdet,LatticeOTFmask,Iter,SNR,LatticeyFWHM2);
 
+[SWconvLines,~,~,~] = ConvRes(PSFIncoherent,PSFdet,SNR);
+[LatticeconvLines,~,~,~] = ConvRes(LatticePSFDithered,PSFdet,SNR);
 [AberratedSWconvLines,lineSpot,Spacing,LineZ] = ConvRes(AberratedPSFIncoherent,PSFdet,SNR);
 [AberratedLatticeconvLines,~,~,~] = ConvRes(AberratedLatticePSFDithered,PSFdet,SNR);
 
@@ -291,20 +293,20 @@ print(fig3, '-dsvg', [  savingdir 'FC3' '.SVG'],'-r300')
 print(fig3, '-dpng', [  savingdir 'FC3' '.PNG'],'-r300')
 
 fig4 = figure;
-    plot(LineZ,AberratedSWconvLines((N+1)/2,:),'Color',[0.4660 0.6740 0.1880],'LineWidth',0.5)
+    plot(LineZ,SWconvLines((N+1)/2,:),'magenta','LineWidth',0.5)
     hold on
-    plot(LineZ,AberratedLatticeconvLines((N+1)/2,:),'Color',[0.8500 0.3250 0.0980],'LineStyle','-.','LineWidth',0.5)
+    plot(LineZ,LatticeconvLines((N+1)/2,:),'Color','b','LineWidth',0.5)
+    plot(LineZ,AberratedSWconvLines((N+1)/2,:),'Color',[0.4660 0.6740 0.1880],'LineWidth',0.5)
+    plot(LineZ,AberratedLatticeconvLines((N+1)/2,:),'Color',[0.8500 0.3250 0.0980],'LineWidth',0.5)
     xline(LineZ(lineSpot),'k')
     xlim([0,50])
     ylim([0,50])
-    legend("aberrated pSW","aberrated LLS")
-    title("Spacing increment=20+" + num2str(20) + "nm")
+    legend("pSW","LLS","aberrated iSW","aberrated LLS")
     xlabel("z(lambda/n)")
     ylabel("Intensity (a.u)")
     hold off 
     grid on
     pbaspect([7 2 1])
-
 print(fig4, '-dsvg', [  savingdir 'LineGrating' '.SVG'],'-r300')
 print(fig4, '-dpng', [  savingdir 'LineGrating' '.PNG'],'-r300')
 
@@ -317,7 +319,6 @@ fig5 = figure;
     ylim([0,20])
     clim([0,50])
     colorbar
-    title("Spacing increment=200+" + num2str(20) + "nm")
     xlabel("z(um)")
     ylabel("um")
     hold off
@@ -333,7 +334,6 @@ fig6 = figure;
     ylim([0,20])
     clim([0,50])
     colorbar
-    title("Spacing increment=200+" + num2str(20) + "nm")
     xlabel("z(um)")
     ylabel("um")
     hold off
