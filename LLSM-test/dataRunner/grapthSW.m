@@ -242,6 +242,21 @@ function grapthSW(NA1,deltaNA,LatticeType,weighting,PSFIncoherent,PSFCoherent,SW
     print(fig7, '-dsvg', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_xzOTFPhase_weighting_' num2str(weighting) '.SVG'],'-r300')
     print(fig7, '-dpng', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_xzOTFPhase_weighting_' num2str(weighting) '.PNG'],'-r300')
 
+    fig = figure;
+    imagesc(KX_exc,KZ_exc,abs(IncoherentxzOTFexc)/max(abs(IncoherentxzOTFexc),[],'all'))
+    axis image
+    xlabel("k_x/(4\pin/\lambda_{exc})");
+    ylabel("k_z/(4\pin/\lambda_{exc})");
+    xlim([-0.5,0.5])
+    ylim([-0.5,0.5])
+    colormap(firemap)
+    colorbar
+    clim([0,1])
+    hold on
+    plot(abs(IncoherentzOTFexc)/max(abs(IncoherentzOTFexc))/2,KZ_exc,'LineWidth',0.5,'Color','w')
+    print(fig, '-dsvg', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_absxzOTF_weighting_' num2str(weighting) '.SVG'],'-r300')
+    print(fig, '-dpng', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_absxzOTF_weighting_' num2str(weighting) '.PNG'],'-r300')
+
     fig8 = figure;
     imagesc(X_exc,Z_exc,xzPSFoverall)
     axis image
@@ -285,6 +300,21 @@ function grapthSW(NA1,deltaNA,LatticeType,weighting,PSFIncoherent,PSFCoherent,SW
     % plot(angle(IncoherentzOTFexc)/max(angle(IncoherentzOTFexc))/pi,KZ_exc,'LineWidth',2,'Color','green')
     print(fig10, '-dsvg', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_xzOTF_overallPhase_weighting_' num2str(weighting) '.SVG'],'-r300')
     print(fig10, '-dpng', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_xzOTF_overallPhase_weighting_' num2str(weighting) '.PNG'],'-r300')
+
+    fig = figure;
+    imagesc(KX_exc,KZ_exc,abs(xzOTFoverall)/max(abs(xzOTFoverall),[],'all'))
+    axis image
+    xlabel("k_x/(4\pin/\lambda_{exc})");
+    ylabel("k_z/(4\pin/\lambda_{exc})");
+    xlim([-1,1])
+    ylim([-1,1])
+    colormap(firemap)
+    colorbar
+    clim([0,1])
+    hold on
+    plot(abs(zOTFoverall)/max(abs(zOTFoverall))/2,KZ_exc,'LineWidth',0.5,'Color','w')
+    print(fig, '-dsvg', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_absxzOTF_overall_weighting_' num2str(weighting) '.SVG'],'-r300')
+    print(fig, '-dpng', [savingdir  'SW_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_absxzOTF_overall_weighting_' num2str(weighting) '.PNG'],'-r300')
 
     fig13 = figure;
     imagesc(X_exc,Z_exc,IncoherentxyPSFexc)
