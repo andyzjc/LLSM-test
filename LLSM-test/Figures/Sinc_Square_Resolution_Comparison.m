@@ -89,8 +89,8 @@ for k = 1:length(NA1)
     analytical_X = deltaNA_Square_equivalent ./ (2*NA1_Iter);
     analytical_Y = (NA1_Iter + (deltaNA_Square_equivalent)./2 ) ./ (deltaNA_sinc_equivalent);
 
-    NA1_diff_sum = [NA1_diff_sum analytical_X];
-    NA_Ratio = [NA_Ratio analytical_Y];
+    NA1_diff_sum = [NA1_diff_sum; analytical_X];
+    NA_Ratio = [NA_Ratio;analytical_Y];
 
     fig1 = figure;
     scatter(deltaNA1,sqrt(2.*deltaNA1*NA1_Iter)) % approximation
