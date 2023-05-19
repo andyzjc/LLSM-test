@@ -6,3 +6,4 @@ LLSM-test/.DS_Store
 *.PNG
 MasterDemo.m
 LLSM-test/Detection/DetectionPSF_1025.mat
+LLSM-test/Parameters/getParameters.m
