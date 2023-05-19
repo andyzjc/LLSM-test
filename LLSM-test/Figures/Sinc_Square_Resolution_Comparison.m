@@ -7,15 +7,6 @@ addpath([pwd '/' addpath(genpath("LLSM-test/"))])
 getParameters; %modify image parameter here
 CalculatePhysics;
 
-%% Analytical curve
-% x = 0.01:0.01:2;
-% y = 1/2*(sqrt(x)+sqrt(1./x));
-% plot(x,y)
-% grid on
-% xlim([0,2])
-% % ylim([0,1])
-% hold on
-
 %% Approximation 
 NA1 = 0.5;
 deltaNA1 = 0.02:0.005:0.17; 
@@ -102,3 +93,11 @@ grid on
 
 %% Strict Condition
 
+%% Analytical curve
+% x = 0.01:0.01:2;
+% y = 1/2*(sqrt(x)+sqrt(1./x));
+% plot(x,y)
+% grid on
+% xlim([0,2])
+% % ylim([0,1])
+% hold on

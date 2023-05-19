@@ -1,4 +1,4 @@
-function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Strehl(SWPupil,LatticePupil,MinRadialOrder,MaxRadialOrder,PhaseAmplitude,PSFdet)
+function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Strehl(SWPupil,LatticePupil,MinRadialOrder,MaxRadialOrder,PhaseAmplitude,PSFdet,PupilNA)
     getParameters; %modify image parameter here
     CalculatePhysics;
 
@@ -23,8 +23,9 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
             RadioOrderArray(1,counter) = i;
             AngularFrequencyArray(counter) = AngularFrequency(k);
             
-            [ComplexPhase,phase] = GetSingleZmodePupil(i,AngularFrequency(k),PhaseAmplitude);
-    
+            phase = GetSingleZmodePupil(i,AngularFrequency(k),PupilNA);
+            ComplexPhase = exp(PhaseAmplitude .* 1i .* phase);
+
             AberratedSWPSF = zeros(size(phase));
             %SW 
             for j = 1:size(SWPupil,3)
@@ -37,7 +38,7 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
             SW_SRatio(counter,1) = max(AberratedSWPSF.*PSFdet(:,:,(N+1)/2),[],'all'); % only at focal point/ on optical axis
 
             AberratedLatticePupil = zeros(size(phase));
-            AberratedLatticePupil = LatticePupil .* exp( 1i.*phase);
+            AberratedLatticePupil = LatticePupil .* ComplexPhase;
             AberratedLatticePSF = abs(fftshift(ifft2(fftshift(AberratedLatticePupil)))).^2;
             AberratedLatticePSF = meshgrid(mean(AberratedLatticePSF,2))';
             AberratedLatticePSF = AberratedLatticePSF/Latticevalue;

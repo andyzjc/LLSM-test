@@ -39,6 +39,7 @@ maxWFE = 2; %um
 IntScaledwavefront = Scaledwavefront/max(Scaledwavefront,[],'all');
 IntScaledwavefront = maxWFE.*(IntScaledwavefront');
 phase = IntScaledwavefront * 2*pi/(wavelength_exc);
+ComplexPhase = exp(1i.*phase);
 
 fig1 = figure;
     imagesc(KZ_exc,KX_exc,phase/(2*pi))
@@ -49,7 +50,6 @@ fig1 = figure;
     ylabel("k_z/(4\pin/\lambda_{exc})");
     axis image
 
-ComplexPhase = exp(1i.*phase);
 %% Pupil
 clc
 NA1 = 0.58;
@@ -134,6 +134,10 @@ else % square
     0.8,0,...
     Latticeweighting);
 end
+
+
+
+
 %% PSF
 [~,PSFIncoherent,SWcenter] = SimulateSWPair(SWPupil);
 PSFIncoherent = PSFIncoherent/max(PSFIncoherent,[],'all');
@@ -304,7 +308,7 @@ fig5 = figure;
     hold off
 print(fig5, '-dsvg', [  savingdir 'SWLines' '.SVG'],'-r300')
 print(fig5, '-dpng', [  savingdir 'SWLines' '.PNG'],'-r300')    
-    
+
 fig6 = figure;
     imagesc(LineZ,LineZ,AberratedLatticeconvLines)
     colormap(hot)
@@ -322,7 +326,7 @@ print(fig6, '-dsvg', [  savingdir 'LLSLines' '.SVG'],'-r300')
 print(fig6, '-dpng', [  savingdir 'LLSLines' '.PNG'],'-r300')  
 close all
 
-%% decomposition
+% %% decomposition
 MinRadialOrder = 0;
 MaxRadialOrder = 6;
 [theta,r] = cart2pol(kx_exc./(0.65./n*k_wave),kz_exc./(0.65./n*k_wave));

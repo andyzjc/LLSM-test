@@ -29,6 +29,7 @@ Latticeweighting = 1; % 1.9 for V2 LLS
 SNR = 10;
 Iter = 10;
 OTFthreshold = 0.001;
+PupilNA = 0.65;
 
 savingdir = [LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_' ProfileType '/'];
 mkdir(savingdir) 
@@ -157,7 +158,7 @@ save([ LLSDatasavingdir '/LatticePSFDithered_LineGrating.mat'], 'LatticeconvLine
 
 %% Aberrated
 clc
-[theta,r] = cart2pol(kx_exc./(0.65./n*k_wave),kz_exc./(0.65./n*k_wave));
+[theta,r] = cart2pol(kx_exc./(PupilNA./n*k_wave),kz_exc./(PupilNA./n*k_wave));
 idx = r<=1;
 
 MinRadialOrder = 0;
@@ -195,7 +196,8 @@ counter = 1;
 for i = MinRadialOrder:MaxRadialOrder
     AngularFrequency = -i:2:i;
     for k = 1:length(AngularFrequency)
-        [ComplexPhase,phase] = GetSingleZmodePupil(i,AngularFrequency(k),PhaseAmplitude);
+        phase = GetSingleZmodePupil(i,AngularFrequency(k),PupilNA);
+        ComplexPhase = exp(PhaseAmplitude .* 1i .* phase);
 
         AberratedPupil1 = zeros(size(phase));
         AberratedPupil2 = zeros(size(phase));
@@ -229,7 +231,8 @@ counter = 1;
 for i = MinRadialOrder:MaxRadialOrder
     AngularFrequency = -i:2:i;
     for k = 1:length(AngularFrequency)
-        [ComplexPhase,phase] = GetSingleZmodePupil(i,AngularFrequency(k),PhaseAmplitude);
+        phase = GetSingleZmodePupil(i,AngularFrequency(k),PupilNA);
+        ComplexPhase = exp(PhaseAmplitude .* 1i .* phase);
 
         % %Lattice
         temp2 = zeros(size(phase));
@@ -310,7 +313,7 @@ Pupilsavingdir = [Analysis_savingdir 'PupilError/'];
 mkdir(Pupilsavingdir)
 counter = 1;
 for i = 1:length(RadioOrderArray)
-    [ComplexPhase,phase] = GetSingleZmodePupil(RadioOrderArray(i),AngularFrequencyArray(i),PhaseAmplitude);
+    phase = GetSingleZmodePupil(RadioOrderArray(i),AngularFrequencyArray(i),PupilNA);
     fig1 = figure;
     imagesc(KX_exc,KZ_exc,phase/2/pi)
     axis image
