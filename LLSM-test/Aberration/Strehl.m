@@ -28,6 +28,7 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
 
             AberratedSWPSF = zeros(size(phase));
             %SW 
+            temp = [];
             for j = 1:size(SWPupil,3)
                 PupilIter = SWPupil(:,:,j);
                 AberratedSWPupil = PupilIter .* ComplexPhase;
