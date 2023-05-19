@@ -4,3 +4,5 @@ LLSM-test/.DS_Store
 .DS_Store
 *.SVG
 *.PNG
+MasterDemo.m
+LLSM-test/Detection/DetectionPSF_1025.mat

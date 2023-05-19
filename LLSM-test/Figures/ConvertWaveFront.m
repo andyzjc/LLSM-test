@@ -58,7 +58,7 @@ LatticeType = 'hex';
 ProfileType = 'tophat';
 SWweighting = 7/10; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
 Latticeweighting = 1; % 1.9 for V2 LLS
-SNR = 3;
+SNR = 10;
 Iter = 10;
 OTFthreshold = 0.001;
 
@@ -293,6 +293,7 @@ fig5 = figure;
     imagesc(LineZ,LineZ,AberratedSWconvLines)
     colormap(hot)
     hold on
+    axis image
     xline(LineZ(lineSpot),'k','LineWidth',1)
     xlim([0,50])
     ylim([0,20])
@@ -309,6 +310,7 @@ fig6 = figure;
     colormap(hot)
     hold on
     xline(LineZ(lineSpot),'k','LineWidth',1)
+    axis image
     xlim([0,50])
     ylim([0,20])
     clim([0,50])
@@ -316,6 +318,26 @@ fig6 = figure;
     xlabel("z(um)")
     ylabel("um")
     hold off
-print(fig5, '-dsvg', [  savingdir 'LLSLines' '.SVG'],'-r300')
-print(fig5, '-dpng', [  savingdir 'LLSLines' '.PNG'],'-r300')  
+print(fig6, '-dsvg', [  savingdir 'LLSLines' '.SVG'],'-r300')
+print(fig6, '-dpng', [  savingdir 'LLSLines' '.PNG'],'-r300')  
 close all
+
+%% decomposition
+MinRadialOrder = 0;
+MaxRadialOrder = 6;
+[theta,r] = cart2pol(kx_exc./(0.65./n*k_wave),kz_exc./(0.65./n*k_wave));
+idx = r<=1;
+
+RadioOrderArray = [];
+AngularFrequencyArray =[];
+counter =1;
+for i = MinRadialOrder:MaxRadialOrder
+    AngularFrequency = -i:2:i;
+    for k = 1:length(AngularFrequency)
+        RadioOrderArray(1,counter) = i;
+        AngularFrequencyArray(1,counter) = AngularFrequency(k);
+        counter = counter +1;
+    end
+end
+
+Z = zernfun(RadioOrderArray,AngularFrequencyArray,r(idx),theta(idx));

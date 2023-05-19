@@ -78,13 +78,14 @@ NA1 = 0.58;
 deltaNA = 0.04;
 LatticeType = 'hex';
 ProfileType = 'tophat';
-SWweighting = 1; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
+SWweighting = 7/10; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
 Latticeweighting = 1; % 1.9 for V2 LLS
 SNR = 10;
 Iter = 10;
 OTFthreshold = 0.001;
+wavefrontNA = 1.1;
 
-savingdir = ['Composite_Pupil_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_' ProfileType '_SWWeighting_' num2str(SWweighting) '_LLSWeighting_' num2str(LattticeWeighting) '_SNR_' num2str(SNR) '/'];
+savingdir = ['Eric_Betzig_Zebrafish_Aberration_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_' ProfileType '_SWWeighting_' num2str(SWweighting) '_LLSWeighting_' num2str(LattticeWeighting) '_SNR_' num2str(SNR) '/'];
 mkdir(savingdir)
 print(fig1, '-dsvg', [  savingdir 'Wavefront' '.SVG'],'-r300')
 print(fig1, '-dpng', [  savingdir 'Wavefront' '.PNG'],'-r300')   
@@ -314,6 +315,7 @@ fig5 = figure;
     imagesc(LineZ,LineZ,AberratedSWconvLines)
     colormap(hot)
     hold on
+    axis image
     xline(LineZ(lineSpot),'k','LineWidth',1)
     xlim([0,50])
     ylim([0,20])
@@ -330,6 +332,7 @@ fig6 = figure;
     colormap(hot)
     hold on
     xline(LineZ(lineSpot),'k','LineWidth',1)
+    axis image
     xlim([0,50])
     ylim([0,20])
     clim([0,50])
@@ -337,6 +340,6 @@ fig6 = figure;
     xlabel("z(um)")
     ylabel("um")
     hold off
-print(fig5, '-dsvg', [  savingdir 'LLSLines' '.SVG'],'-r300')
-print(fig5, '-dpng', [  savingdir 'LLSLines' '.PNG'],'-r300')     
+print(fig6, '-dsvg', [  savingdir 'LLSLines' '.SVG'],'-r300')
+print(fig6, '-dpng', [  savingdir 'LLSLines' '.PNG'],'-r300')  
 close all
