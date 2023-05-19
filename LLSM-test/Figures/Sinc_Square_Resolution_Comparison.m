@@ -7,7 +7,8 @@ addpath([pwd '/' addpath(genpath("LLSM-test/"))])
 getParameters; %modify image parameter here
 CalculatePhysics;
 
-savingdir = ['NaJi_Zebrafish_motor_neuron_Aberration_' LatticeType '_' num2str(NA1) '_' num2str(deltaNA) '_' ProfileType '_SWWeighting_' num2str(SWweighting) '_LLSWeighting_' num2str(Latticeweighting) '_SNR_' num2str(SNR) '/'];
+savingdir = 'ResolutionComparison/';
+mkdir(savingdir)
 
 %% parameters 
 NA1 = (0.3:0.05:0.55)';
@@ -44,6 +45,7 @@ for k = 1:length(NA1)
         sincPupil = zeros(N,N);
         sincPupil(:,(N+1)/2) = (k_apertureNA) >= abs(kz_exc(:,1));
         [~,sincPSFDithered,~] = SimulateLattice(sincPupil);
+        sincPSFDithered = sincPSFDithered/max(sincPSFDithered,[],'all');
         yindex = 1-(squeeze(sincPSFDithered((N+1)/2,(N+1)/2,:)) <= 0.5*max(squeeze(sincPSFDithered((N+1)/2,(N+1)/2,:))));
         SincyFWHM1index = find(yindex,1,'first');
         Sinc_yFWHM(i) = abs(Y_exc(SincyFWHM1index)).*2;
@@ -121,5 +123,6 @@ fig3 = figure;
     hold on
     plot(NA1_diff_sum,NA_Ratio)
     legend("Analytical","Numerical")
-
+    print(fig3, '-dsvg', [  savingdir 'Resolution_Comparison' '.SVG'],'-r300')
+    print(fig3, '-dpng', [  savingdir 'Resolution_Comparison' '.PNG'],'-r300') 
 
