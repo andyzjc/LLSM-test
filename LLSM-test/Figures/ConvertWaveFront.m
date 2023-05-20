@@ -20,9 +20,11 @@ wavefront = double(wavefront);
 mask = (row/2-3).^2 >= (x.^2+y.^2); 
 wavefront = wavefront.*mask;
 
-%% scale to 1.1 NA
-NA = 0.65;
-k_NA = (NA * k_wave/n);
+%% scale to 0.65 NA
+PupilNA = 0.65;
+[theta,r] = cart2pol(kx_exc./(PupilNA./n*k_wave),kz_exc./(PupilNA./n*k_wave));
+idx = r<=1;
+k_NA = (PupilNA * k_wave/n);
 deltak_wavefront = k_NA/(row/2-5);
 
 wavefront_pad = padarray(wavefront,[round(k_bound/deltak_wavefront-(row/2-5)),round(k_bound/deltak_wavefront-(row/2-5))],0);
@@ -38,18 +40,30 @@ Scaledwavefront = Scaledwavefront(Image_center-(N+1)/2+1:Image_center+(N+1)/2-1,
 maxWFE = 2; %um
 IntScaledwavefront = Scaledwavefront/max(Scaledwavefront,[],'all');
 IntScaledwavefront = maxWFE.*(IntScaledwavefront');
+IntScaledwavefront(idx) = IntScaledwavefront(idx) - mode(mode(IntScaledwavefront(idx)));
 phase = IntScaledwavefront * 2*pi/(wavelength_exc);
 ComplexPhase = exp(1i.*phase);
 
 fig1 = figure;
-    imagesc(KZ_exc,KX_exc,phase/(2*pi))
+    imagesc(KZ_exc,KX_exc,IntScaledwavefront)
+    title("Unit: um")
+    colorbar
+    colormap(turbo)
+    xlabel("k_x/(4\pin/\lambda_{exc})");
+    ylabel("k_z/(4\pin/\lambda_{exc})");
+    axis image
+    clim([-0.5,0.5])
+
+fig2 = figure;
+    imagesc(KZ_exc,KX_exc,IntScaledwavefront/wavelength_exc)
     title("Unit: lambda/n")
     colorbar
     colormap(turbo)
     xlabel("k_x/(4\pin/\lambda_{exc})");
     ylabel("k_z/(4\pin/\lambda_{exc})");
     axis image
-
+    % clim([min(IntScaledwavefront/wavelength_exc,[],'all'),max(IntScaledwavefront/wavelength_exc,[],'all')])
+    clim([-2,2])
 %% Pupil
 clc
 NA1 = 0.58;
@@ -57,7 +71,7 @@ deltaNA = 0.04;
 LatticeType = 'hex';
 ProfileType = 'tophat';
 SWweighting = 7/10; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
-Latticeweighting = 1; % 1.9 for V2 LLS
+Latticeweighting = [1 1 1 1 1 1]; % 1.9 for V2 LLS
 SNR = 10;
 Iter = 10;
 OTFthreshold = 0.001;
@@ -326,22 +340,87 @@ print(fig6, '-dsvg', [  savingdir 'LLSLines' '.SVG'],'-r300')
 print(fig6, '-dpng', [  savingdir 'LLSLines' '.PNG'],'-r300')  
 close all
 
-% %% decomposition
-MinRadialOrder = 0;
+%% decomposition
+MinRadialOrder = 1;
 MaxRadialOrder = 6;
-[theta,r] = cart2pol(kx_exc./(0.65./n*k_wave),kz_exc./(0.65./n*k_wave));
-idx = r<=1;
 
+LabelArray = cell(length(RadioOrderArray),1);
+for i = 1:length(RadioOrderArray)
+    LabelArray{i,1} = "Z^{" + num2str(AngularFrequencyArray(i)) + "}_{" + num2str(RadioOrderArray(i)) + "}";
+end
+
+counter = 1;
 RadioOrderArray = [];
 AngularFrequencyArray =[];
-counter =1;
 for i = MinRadialOrder:MaxRadialOrder
     AngularFrequency = -i:2:i;
     for k = 1:length(AngularFrequency)
         RadioOrderArray(1,counter) = i;
         AngularFrequencyArray(1,counter) = AngularFrequency(k);
+
+        temp = zeros(N,N);
+        temp(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx));
+        factor_top(:,counter) = max(temp(idx)) - min(temp(idx));
+
+        Z(:,counter) = temp(idx);
         counter = counter +1;
     end
 end
 
-Z = zernfun(RadioOrderArray,AngularFrequencyArray,r(idx),theta(idx));
+temp = IntScaledwavefront(idx);
+a_mn = Z\temp(:); % nm
+b_mn_A = a_mn.*factor_top';
+ZCoeff = b_mn_A;
+
+counter = 1;
+composite_wavefront = zeros(N,N);
+Z_iter = zeros(N,N);
+for i = 1:3
+    AngularFrequency = -i:2:i;
+    for k = 1:length(AngularFrequency)
+        Z_iter(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx));
+        composite_wavefront(idx) = composite_wavefront(idx) +  (ZCoeff(counter)) .* Z_iter(idx);
+        counter = counter + 1;
+    end
+end
+figure
+imagesc(KZ_exc,KX_exc,composite_wavefront)
+xlabel("k_x/(4\pin/\lambda_{exc})");
+ylabel("k_z/(4\pin/\lambda_{exc})");
+axis image
+title("n=1-3")
+colormap(turbo)
+colorbar
+clim([-0.5 0.5])
+
+for i = 4:6
+    AngularFrequency = -i:2:i;
+    for k = 1:length(AngularFrequency)
+        Z_iter(idx) = zernfun(i,AngularFrequency(k),r(idx),theta(idx));
+        composite_wavefront(idx) = composite_wavefront(idx) +  (ZCoeff(counter)) .* Z_iter(idx);
+        counter = counter + 1;
+    end
+end
+figure
+imagesc(KZ_exc,KX_exc,composite_wavefront)
+xlabel("k_x/(4\pin/\lambda_{exc})");
+ylabel("k_z/(4\pin/\lambda_{exc})");
+axis image
+clim([-0.5 0.5])
+title("n=1-3+n=4-6")
+colormap(turbo)
+colorbar
+
+fig1 = figure;
+    h1 = subplot(1,1,1,'Parent',fig1);
+    bar(1:length(ZCoeff),ZCoeff,0.75)
+    xlabel("Zernike Mode")
+    ylabel("Mode Amplitude (um)")
+    title("Naji science advance 2020, fig6")
+    h1.XAxis.TickValues = 1:length(RadioOrderArray);
+    h1.XAxis.TickLabels = LabelArray;
+    h1.XAxis.FontSize = 8;
+    pbaspect([6 2 1])
+    hold off
+    ylim([-0.5,0.5])
+    grid on

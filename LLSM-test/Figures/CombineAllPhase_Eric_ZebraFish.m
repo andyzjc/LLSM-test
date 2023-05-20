@@ -82,7 +82,7 @@ deltaNA = 0.04;
 LatticeType = 'hex';
 ProfileType = 'tophat';
 SWweighting = 7/10; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
-Latticeweighting = 1; % 1.9 for V2 LLS
+Latticeweighting = [1 1 1 1 1 1]; % 1.9 for V2 LLS
 SNR = 10;
 Iter = 10; 
 OTFthreshold = 0.001;
@@ -205,6 +205,7 @@ axis image
 ylim([-xzviewSize,xzviewSize])
 xlim([-yViewSize,yViewSize])
 title("Aberrated yz, NA1")
+clim([0,1])
     print(fig1, '-dsvg', [ savingdir 'AberratedNA1' '.SVG'],'-r300')
     print(fig1, '-dpng', [ savingdir 'AberratedNA1' '.PNG'],'-r300')
 
@@ -217,6 +218,7 @@ axis image
 ylim([-xzviewSize,xzviewSize])
 xlim([-yViewSize,yViewSize])
 title("Aberrated yz, NA2")
+clim([0,1])
     print(fig1, '-dsvg', [ savingdir 'AberratedNA2' '.SVG'],'-r300')
     print(fig1, '-dpng', [ savingdir 'AberratedNA2' '.PNG'],'-r300')
 
@@ -229,6 +231,7 @@ axis image
 ylim([-xzviewSize,xzviewSize])
 xlim([-yViewSize,yViewSize])
 title("Aberrated yz")
+clim([0,1])
     print(fig1, '-dsvg', [ savingdir 'Aberratedyz' '.SVG'],'-r300')
     print(fig1, '-dpng', [ savingdir 'Aberratedyz' '.PNG'],'-r300')
 
@@ -241,6 +244,7 @@ axis image
 xlim([-xzviewSize,xzviewSize])
 ylim([-xzviewSize,xzviewSize])
 title("Aberrated xz")
+clim([0,1])
     print(fig2, '-dsvg', [ savingdir 'Aberratedxz' '.SVG'],'-r300')
     print(fig2, '-dpng', [ savingdir 'Aberratedxz' '.PNG'],'-r300')
 
@@ -253,6 +257,7 @@ axis image
 ylim([-xzviewSize,xzviewSize])
 xlim([-yViewSize,yViewSize])
 title("y-correct yz")
+clim([0,1])
     print(fig2, '-dsvg', [ savingdir 'y_corrected_yz' '.SVG'],'-r300')
     print(fig2, '-dpng', [ savingdir 'y_corrected_yz' '.PNG'],'-r300')
 
@@ -265,6 +270,7 @@ axis image
 xlim([-xzviewSize,xzviewSize])
 ylim([-xzviewSize,xzviewSize])
 title("y-correct xz, at NA2 max (Not the same focal)")
+clim([0,1])
     print(fig2, '-dsvg', [ savingdir 'y_corrected_xz' '.SVG'],'-r300')
     print(fig2, '-dpng', [ savingdir 'y_corrected_xz' '.PNG'],'-r300')
 
@@ -277,6 +283,7 @@ axis image
 ylim([-xzviewSize,xzviewSize])
 xlim([-yViewSize,yViewSize])
 title("yz-correct yz")
+clim([0,1])
     print(fig2, '-dsvg', [ savingdir 'yz_corrected_yz' '.SVG'],'-r300')
     print(fig2, '-dpng', [ savingdir 'yz_corrected_yz' '.PNG'],'-r300')
 
@@ -289,6 +296,7 @@ axis image
 xlim([-xzviewSize,xzviewSize])
 ylim([-xzviewSize,xzviewSize])
 title("yz-correct xz, at NA2 max (Not the same focal)")
+clim([0,1])
     print(fig2, '-dsvg', [ savingdir 'yz_corrected_xz' '.SVG'],'-r300')
     print(fig2, '-dpng', [ savingdir 'yz_corrected_xz' '.PNG'],'-r300')
 

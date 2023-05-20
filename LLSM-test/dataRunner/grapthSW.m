@@ -137,7 +137,7 @@ function grapthSW(NA1,deltaNA,LatticeType,weighting,PSFIncoherent,PSFCoherent,SW
         zFWHM = "N/A";
     end
 
-    Pupil = SWPupil(:,:,1)+SWPupil(:,:,2);
+    Pupil = sum(SWPupil,3);
     Pupil = Pupil/max(Pupil,[],'all');
     fig1 = figure;
     imagesc(KX_exc,KZ_exc,real(Pupil) )
