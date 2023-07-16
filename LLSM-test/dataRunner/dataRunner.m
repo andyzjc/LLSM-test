@@ -20,12 +20,12 @@ PSFdet = PSFdet./(max(max(max(PSFdet))));
 
 %% Unaberrated
 clc
-NA1 = 0.58;
-deltaNA = 0.04;
-LatticeType = 'hex';
+NA1 = 0.253;
+deltaNA = 0.08;
+LatticeType = 'sinc';
 ProfileType = 'tophat';
-SWweighting = 7/10; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
-Latticeweighting = 1; % 1.9 for V2 LLS
+SWweighting = 1; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
+Latticeweighting = [1,1,1,1,1,1]; % 1.9 for V2 LLS
 SNR = 10;
 Iter = 10;
 OTFthreshold = 0.001;
@@ -42,6 +42,9 @@ mkdir(SWDatasavingdir)
 LLSDatasavingdir = [savingdir 'LLSdata/'];
 mkdir(LLSDatasavingdir) 
 
+SWPupil = zeros(N,N);
+LatticePupil = zeros(N,N);
+k_apertureNA = NA1 * k_wave / n;
 if isequal(LatticeType,'hex')
     [SWPupil,SWmask,SWPupilMetaData] = GetSWPairPupil(ProfileType,NA1,NA1/2,...
     deltaNA,2*deltaNA,...
@@ -74,24 +77,35 @@ elseif isequal(LatticeType,'sinc')
     NA1*2,NA1*2,...
     SWweighting);
 
-    LatticePupil = load('LLSM-test/Aberration/Zernike/AiryPupil513_0p6.mat');
-    temp = LatticePupil.AiryPupil;
-    LatticePupil = zeros(size(temp));
-    LatticePupil(:,(N+1)/2) = temp(:,(N+1)/2);
+    LatticePupil(:,(N+1)/2) = (k_apertureNA) >= abs(kz_exc(:,1));
+
+    % LatticePupil = load('LLSM-test/Aberration/Zernike/AiryPupil513_0p6.mat');
+    % temp = LatticePupil.AiryPupil;
+    % LatticePupil = zeros(size(temp));
+    % LatticePupil(:,(N+1)/2) = temp(:,(N+1)/2);
 elseif isequal(LatticeType,'1dgaussian')
     [SWPupil,~,~] = GetSWPairPupil('gaussian',0,0,...
     0,NA1,...
     SWweighting);
+    
+    gaussian_mask = zeros(N,N);
+    gaussian_mask(:,(N+1)/2) = (k_apertureNA) >= abs(kz_exc(:,1));
+    LatticePupil(:,(N+1)/2) = exp( -(kz_exc(:,1).^2)/ ((k_apertureNA).^2) );
+    LatticePupil = LatticePupil.* gaussian_mask;
 
-    LatticePupil = load('LLSM-test/Aberration/Zernike/1dGaussianPupil513_NA_0p6.mat');
-    LatticePupil = LatticePupil.GaussianPupil;
+    % LatticePupil = load('LLSM-test/Aberration/Zernike/1dGaussianPupil513_NA_0p6.mat');
+    % LatticePupil = LatticePupil.GaussianPupil;
 elseif isequal(LatticeType,'2dgaussian')
     [SWPupil,~,~] = GetSWPairPupil('gaussian',0,0,...
     0,NA1,...
     SWweighting);
 
-    LatticePupil = load('LLSM-test/Aberration/Zernike/2dGaussianPupil513_NA_0p6.mat');
-    LatticePupil = LatticePupil.GaussianPupil;
+    gaussian_mask = zeros(N,N);
+    gaussian_mask= (k_apertureNA).^2 >= abs((kx_exc.^2 + kz_exc.^2));
+    LatticePupil = exp( -(kx_exc.^2 + kz_exc.^2)/ ((k_apertureNA).^2) );
+    LatticePupil = LatticePupil.* gaussian_mask;
+    % LatticePupil = load('LLSM-test/Aberration/Zernike/2dGaussianPupil513_NA_0p6.mat');
+    % LatticePupil = LatticePupil.GaussianPupil;
 elseif isequal(LatticeType,'bessel')
     [SWPupil,~,~] = GetSWPairPupil('gaussian',NA1,NA1,...
     deltaNA,deltaNA,...
@@ -161,8 +175,8 @@ clc
 [theta,r] = cart2pol(kx_exc./(PupilNA./n*k_wave),kz_exc./(PupilNA./n*k_wave));
 idx = r<=1;
 
-MinRadialOrder = 0;
-MaxRadialOrder = 6;
+MinRadialOrder = 2;
+MaxRadialOrder = 2;
 PhaseAmplitude = 6*wavelength_exc/(2*pi); 
 
 RadioOrderArray = [];

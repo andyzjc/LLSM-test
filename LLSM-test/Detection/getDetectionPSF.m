@@ -43,7 +43,7 @@ function ScaledPSFdet = getDetectionPSF
         propagator_det = exp( 2*pi * 1i * kz_det * z_det(i));
         PSFdet(:,:,i) = abs( fftshift( ifft2(ifftshift(Pupil.* propagator_det)) ) ).^2;
     end 
-    PSFdet = PSFdet/max(max(max(PSFdet))); 
+    % PSFdet = PSFdet/max(max(max(PSFdet)));
     
     %% resize  
     up_factorZ = 0.510/0.488; %approximation from paper 
@@ -68,7 +68,7 @@ function ScaledPSFdet = getDetectionPSF
     end
     Image_centerXY = (up_Image_sizeXY+1)/2;
     XYZScaledPSFdet = XYZScaledPSFdet(:,Image_centerXY-(N+1)/2+1:Image_centerXY+(N+1)/2-1,Image_centerXY-(N+1)/2+1:Image_centerXY+(N+1)/2-1);
-    XYZScaledPSFdet = XYZScaledPSFdet/max(max(max(XYZScaledPSFdet)));
+    % XYZScaledPSFdet = XYZScaledPSFdet/max(max(max(XYZScaledPSFdet)));
     
     ScaledPSFdet = XYZScaledPSFdet;
     

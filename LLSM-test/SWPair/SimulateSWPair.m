@@ -12,14 +12,15 @@ PSFCoherent= zeros(N,N,N);
 PSFIncoherent = zeros(N,N,N);
 Pupil_sum = Pupil1 + Pupil2;
     % propagation
-    for i = 1:length(y_exc)
-        propagator_exc = exp(2*pi * 1i * ky_exc * y_exc(i));
+for i = 1:length(y_exc)
+    propagator_exc = exp(2*pi * 1i * ky_exc * y_exc(i));
 
-        Profile_pupil1(:,:,i) = abs( fftshift( ifft2(ifftshift(Pupil1 .* propagator_exc)) ) ).^2;
-        Profile_pupil2(:,:,i) = abs( fftshift( ifft2(ifftshift(Pupil2 .* propagator_exc)) ) ).^2;
+    Profile_pupil1(:,:,i) = abs( fftshift( ifft2(ifftshift(Pupil1 .* propagator_exc)) ) ).^2;
+    Profile_pupil2(:,:,i) = abs( fftshift( ifft2(ifftshift(Pupil2 .* propagator_exc)) ) ).^2;
 
-        PSFCoherent(:,:,i) = abs( fftshift( ifft2(ifftshift(Pupil_sum .* propagator_exc)) ) ).^2;
-    end
+    PSFCoherent(:,:,i) = abs( fftshift( ifft2(ifftshift(Pupil_sum .* propagator_exc)) ) ).^2;
+    % PSFCoherent(:,:,i) = fftshift( ifft2(ifftshift(Pupil_sum .* propagator_exc)) );
+end
 PSFIncoherent = Profile_pupil1 + Profile_pupil2;
 
 [center(1,1),center(1,2)] = max(PSFCoherent,[],'all'); % value, index
