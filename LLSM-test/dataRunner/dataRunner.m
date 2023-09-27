@@ -18,13 +18,13 @@ PSFdet = PSFdet./(max(max(max(PSFdet))));
 % xzOTFdet = fftshift(fft2(ifftshift(xzPSFdet)));
 % zOTFdet = real(xzOTFdet(:,(N+1)/2));
 
-%% Unaberrated
+%% Unaberrated 
 clc
-NA1 = 0.253;
-deltaNA = 0.08;
-LatticeType = 'sinc';
+NA1 = 0.58;
+deltaNA = 0.04;
+LatticeType = 'hex';
 ProfileType = 'tophat';
-SWweighting = 1; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
+SWweighting = 7/10; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
 Latticeweighting = [1,1,1,1,1,1]; % 1.9 for V2 LLS
 SNR = 10;
 Iter = 10;
