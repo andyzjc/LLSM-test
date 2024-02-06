@@ -2,7 +2,7 @@ function ScaledPSFdet = getDetectionPSF
     getParameters; %modify image parameter here
     CalculatePhysics;
     
-    lambda_det = 0.510; % um 
+    lambda_det = 0.488; % um 
     wavelength_det =  lambda_det / n;
     NAdet = 1;
     

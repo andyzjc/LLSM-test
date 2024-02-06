@@ -16,6 +16,7 @@ NAmin = NAideal - deltaNA/2;
 getParameters;
 CalculatePhysics;
 
+
 % Define pupil and mask
 SWPupil = zeros(N,N,2);
 SWMask = zeros(N,N,2);

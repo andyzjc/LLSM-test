@@ -55,6 +55,7 @@ function grapthSW(NA1,deltaNA,LatticeType,weighting,PSFIncoherent,PSFCoherent,SW
     temp(1,(N+1)/2) = 0;
     temp(1,(N+1)/2+1:end) = absIncoherentSumI((N+1)/2:end);
     absIncoherentSumI = 2* temp(1:end-1);
+    
     % find IFWHM
     [~,minindex] = min(absIncoherentSumI);
     [~,maxindex] = max(absIncoherentSumI);

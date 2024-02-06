@@ -10,9 +10,9 @@ CalculatePhysics;
 %% Simulation of diffraction, trying to understand how much energy is lost during diffraction 
 
 % Start with normal pupil, here use a sinc function, do a x-bounding
-[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('gaussian',0.3/2,0.3/2,...
-                                                           0.3,0.3,...
-                                                           1);
+[SWPupil,SWMask,SWPupilMetaData] = GetSWPairPupil('gaussian',0.56,0.28,...
+                                                           0.08,0.16,...
+                                                           1/6);
 
 xzPSF = abs(fftshift(ifft2(ifftshift(SWPupil(:,:,1))))).^2;
 
@@ -36,7 +36,7 @@ subplot(2,2,2)
 imagesc(xzPSFbound)
 axis image
 subplot(2,2,3)
-imagesc(abs(boundPupil))
+imagesc(real(boundPupil))
 axis image
 subplot(2,2,4)
 [IncoherentSumI,absIncoherentSumI,IncoherentIFWHM_unclip,half] = IFWHM(boundPupil);
@@ -155,4 +155,7 @@ xlabel("width ratio = mask size/diffraction spot")
 ylabel("Ix_FWHM (pixel)")
 % ylim([0,5])
 xlim([0,1])
+
+%% 10/02/23 1d airy beam diffraction simualtion 
+
 

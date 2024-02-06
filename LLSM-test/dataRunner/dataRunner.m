@@ -20,12 +20,12 @@ PSFdet = PSFdet./(max(max(max(PSFdet))));
 
 %% Unaberrated 
 clc
-NA1 = 0.58;
-deltaNA = 0.04;
-LatticeType = 'hex';
+NA1 = 0.565; %0.6 for gaussian
+deltaNA = 0.01;
+LatticeType = 'bessel';
 ProfileType = 'tophat';
-SWweighting = 7/10; %4/3 for equal OTF V2 LLS, 7/10 for V1 LLS
-Latticeweighting = [1,1,1,1,1,1]; % 1.9 for V2 LLS
+SWweighting = 4/3; %4/3 for equal OTF V2 LLS, 1/sqrt(2) for V1 LLS
+Latticeweighting = [1,1.9,1,1,1.9,1]; % 1.9 for V2 LLS
 SNR = 10;
 Iter = 10;
 OTFthreshold = 0.001;
@@ -146,7 +146,7 @@ save([ SWDatasavingdir '/PSFIncoherent_Center.mat'], 'SWcenter')
 % save([ SWDatasavingdir '/PSFIncoherent_FC3FWHM.mat'], 'SWAveragefc3FWHM')
 save([ SWDatasavingdir '/PSFIncoherent_LineGrating.mat'], 'SWconvLines')
 
-%% Lattice
+%% Lattice & and other
 [LatticePSF,LatticePSFDithered,Latticecenter] = SimulateLattice(LatticePupil);
 LatticePSF = LatticePSF/max(LatticePSF,[],'all');
 LatticePSFDithered = LatticePSFDithered/max(LatticePSFDithered,[],'all');
@@ -176,7 +176,7 @@ clc
 idx = r<=1;
 
 MinRadialOrder = 2;
-MaxRadialOrder = 2;
+MaxRadialOrder = 6;
 PhaseAmplitude = 6*wavelength_exc/(2*pi); 
 
 RadioOrderArray = [];
