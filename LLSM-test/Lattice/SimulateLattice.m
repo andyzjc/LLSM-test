@@ -2,9 +2,9 @@ function [LatticePSF,LatticePSFDithered,center] = SimulateLattice(LatticePupil)
 
 getParameters;
 CalculatePhysics;
-% 
+
 % temp = zeros(1,N);
-% temp(1:(N+1)/2-1) = 1./(1+exp(-(-(N+1)/4+1:(N+1)/4-1)));
+% temp(1:(N+1)/2-1) = 1./(1+exp(-(-(N+1)/4+1:(N+1)/4-1))); 
 % temp((N+1)/2:end) = flip(1./(1+exp(-(-(N+1)/4:(N+1)/4-1))));
 % [boundx, ~] = meshgrid(temp);
 % Sample = fftshift(fft2(ifftshift(LatticePupil)));

@@ -6,7 +6,7 @@ function [Averagefc3,Averagefc3FWHM,KR,KZ] = RunFC3(PSFexc,PSFdet,OTFmask,Iter,S
     Averagefc3FWHM = Averagefc3;
 
     for i = 1:length(Iter)
-        [BeadsVol1,BeadsVol2,~] = beadsSimulation3d_plane(PSFexc,PSFdet,SNR,(N+1)/2); %focal plane 
+        [BeadsVol1,BeadsVol2,GT] = beadsSimulation3d_plane(PSFexc,PSFdet,SNR,(N+1)/2); %focal plane 
         [FRCGraph,~,~,KR,~,~] = FC3(BeadsVol1,BeadsVol2);
         Averagefc3 = Averagefc3 + FRCGraph;
     end

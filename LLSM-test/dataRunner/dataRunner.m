@@ -20,12 +20,12 @@ PSFdet = PSFdet./(max(max(max(PSFdet))));
 
 %% Unaberrated 
 clc
-NA1 = 0.565; %0.6 for gaussian
-deltaNA = 0.01;
-LatticeType = 'bessel';
+NA1 = 0.58; %0.6 for gaussian
+deltaNA = 0.04;
+LatticeType = 'hex';
 ProfileType = 'tophat';
-SWweighting = 4/3; %4/3 for equal OTF V2 LLS, 1/sqrt(2) for V1 LLS
-Latticeweighting = [1,1.9,1,1,1.9,1]; % 1.9 for V2 LLS
+SWweighting = 1; %4/3 for equal OTF V2 LLS, 1/sqrt(2) for V1 LLS
+Latticeweighting = [1,1,1,1,1,1]; % 1.9 for V2 LLS
 SNR = 10;
 Iter = 10;
 OTFthreshold = 0.001;
@@ -91,7 +91,7 @@ elseif isequal(LatticeType,'1dgaussian')
     gaussian_mask = zeros(N,N);
     gaussian_mask(:,(N+1)/2) = (k_apertureNA) >= abs(kz_exc(:,1));
     LatticePupil(:,(N+1)/2) = exp( -(kz_exc(:,1).^2)/ ((k_apertureNA).^2) );
-    LatticePupil = LatticePupil.* gaussian_mask;
+    % LatticePupil = LatticePupil.* gaussian_mask;
 
     % LatticePupil = load('LLSM-test/Aberration/Zernike/1dGaussianPupil513_NA_0p6.mat');
     % LatticePupil = LatticePupil.GaussianPupil;
@@ -133,6 +133,16 @@ grapthSW(NA1,deltaNA,LatticeType,SWweighting,PSFIncoherent,PSFCoherent,SWPupil,P
     SWyFWHM1 = find(yindex,1,'first') ;
     SWyFWHM2 = find(yindex,1,'last');
 
+% FWHM at V2 LLS 
+LLSyFWHM = 219;
+xzPSF = LatticePSFDithered(:,:,LLSyFWHM)/max(LatticePSFDithered(:,:,LLSyFWHM));
+imagesc(X_exc,Z_exc,xzPSF.*PSFdet(:,:,(N+1)/2))
+axis image
+xlim([-10,10])
+ylim([-10,10])
+colormap(fire)
+clim([0,1])
+
 % get OTF mask for FC3
 overallOTF = fftshift(ifftn(ifftshift(PSFIncoherent.* PSFdet)));
 xzOTF = abs(squeeze(overallOTF(:,(N+1)/2,:)))/max(abs(squeeze(overallOTF(:,(N+1)/2,:))),[],'all');
@@ -155,6 +165,16 @@ grapthLattice(NA1,deltaNA,LatticeType,Latticeweighting,LatticePSF,LatticePSFDith
     yindex = 1-(squeeze(LatticePSFDithered((N+1)/2,(N+1)/2,:)) <= 0.5*max(squeeze(LatticePSFDithered((N+1)/2,(N+1)/2,:))));
     LatticeyFWHM1 = find(yindex,1,'first');
     LatticeyFWHM2 = find(yindex,1,'last');
+
+% FWHM at V2 LLS 
+LLSyFWHM = 228;
+xzPSF = LatticePSFDithered(:,:,LLSyFWHM)/max(LatticePSFDithered(:,:,LLSyFWHM));
+imagesc(X_exc,Z_exc,xzPSF.*PSFdet(:,:,(N+1)/2))
+axis image
+xlim([-10,10])
+ylim([-10,10])
+colormap(fire)
+clim([0,1])
 
 % get OTF mask for FC3
 overallOTF = fftshift(ifftn(ifftshift(LatticePSFDithered.* PSFdet)));

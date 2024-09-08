@@ -30,7 +30,6 @@ function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet,SNR)
     % get overall PSF
     PSFoverall = PSFexc .* PSFdet;
     xzPSFOveralldecon = PSFoverall(:,:,(N+1)/2);
-    %xzPSFOveralldecon = xzPSFOveralldecon + poissrnd(xzPSFOveralldecon) .* 1/SNR;
     
     % interpolate overall PSF
      rescale_factor = deltax/deltax_line;
@@ -40,26 +39,7 @@ function [convLines,lineSpot,Spacing,LineZ] = ConvRes(PSFexc,PSFdet,SNR)
     scaledxzPSFOverall = scaledxzPSFOverall(Image_center-(N_line+1)/2+1:Image_center+(N_line+1)/2-1,...
                                   Image_center-(N_line+1)/2+1:Image_center+(N_line+1)/2-1);
 
-   %scaledxzPSFOverall = imresize(xzPSFOveralldecon,[N_line,N_line]);
-   %scaledxzPSFOverall = scaledxzPSFOverall + poissrnd(scaledxzPSFOverall) .* 1/SNR;
-
     % Convolution with GT lines
     convLines = conv2(GTLines,scaledxzPSFOverall','same');
     convLines = convLines + poissrnd(convLines) .* 1/SNR;
-    % convLines = convLines/max(max(convLines));
-
-    % deconvlution 
-    % DeconvLines = deconvlucy(convLines,xzPSFOveralldecon,deconIter);
-    % DeconvLines = DeconvLines/max(max(DeconvLines));
-
-    % Plotting 
-    % plot(z_exc_line,GTLines((N+1)/2,:)/max(GTLines((N+1)/2,:)),'k')
-    % hold on
-    % grid on
-    % plot(z_exc_line,convLines((N+1)/2,:)/max(convLines((N+1)/2,:)),'r')
-    % % plot(z_exc_line,DeconvLines((N+1)/2,:)/max(DeconvLines((N+1)/2,:)),'b')
-    % xlim([0,20])
-    % legend("GT","Conv","deConv")
-    % xlabel("z(um)")
-    % hold off
 

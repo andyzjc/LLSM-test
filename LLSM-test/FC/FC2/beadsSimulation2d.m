@@ -1,4 +1,4 @@
-function [Image1,Image2] = beadsSimulation(PSFexc,PSFdet,SNR)
+function [Image1,Image2] = beadsSimulation2d(PSFexc,PSFdet,SNR)
     % Generate random beads and convolve with overallPSF(y)
 %     GTallbeads = importdata("GTbeads_rho_0.005.mat");
 
@@ -52,10 +52,10 @@ function [Image1,Image2] = beadsSimulation(PSFexc,PSFdet,SNR)
     Image1 = temp + poissrnd(temp) * 1/SNR;
     Image2 = temp + poissrnd(temp) * 1/SNR;
 
-    % apply a hamming window 
-    hmwindow = hamming(N)*hamming(N)';
-    Image1 = Image1.*hmwindow;
-    Image2 = Image2.*hmwindow;
+    % % apply a hamming window 
+    % hmwindow = hamming(N)*hamming(N)';
+    % Image1 = Image1.*hmwindow;
+    % Image2 = Image2.*hmwindow;
 
     Image1(Image1<0) = 0;
     Image2(Image2<0) = 0;

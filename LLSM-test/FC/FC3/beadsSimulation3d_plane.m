@@ -3,7 +3,7 @@ function [Vol1,Vol2,GTallbeads] = beadsSimulation3d_plane(PSFexc,PSFdet,SNR,FWHM
     CalculatePhysics;
 
     % determine random beads image size and generate random beads
-    beadPercent = 0.005;
+    beadPercent = 0.0005;
     beads = rand(N-12,N-12);
     beads(beads>beadPercent)=0;
     beads(beads>0)=1;

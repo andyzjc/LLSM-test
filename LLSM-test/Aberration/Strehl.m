@@ -36,14 +36,17 @@ function [SW_SRatio,Lattice_SRatio,RadioOrderArray,AngularFrequencyArray] = Stre
                 AberratedSWPSF = AberratedSWPSF + temp;
             end
             AberratedSWPSF = AberratedSWPSF./SWvalue; 
-            SW_SRatio(counter,1) = max(AberratedSWPSF.*PSFdet(:,:,(N+1)/2),[],'all'); % only at focal point/ on optical axis
 
             AberratedLatticePupil = zeros(size(phase));
             AberratedLatticePupil = LatticePupil .* ComplexPhase;
             AberratedLatticePSF = abs(fftshift(ifft2(fftshift(AberratedLatticePupil)))).^2;
             AberratedLatticePSF = meshgrid(mean(AberratedLatticePSF,2))';
             AberratedLatticePSF = AberratedLatticePSF/Latticevalue;
+
+            SW_SRatio(counter,1) = max(AberratedSWPSF.*PSFdet(:,:,(N+1)/2),[],'all'); % only at focal point/ on optical axis
             Lattice_SRatio(counter,1) = max(AberratedLatticePSF.*PSFdet(:,:,(N+1)/2),[],'all');
+            % SW_SRatio(counter,1) = max(AberratedSWPSF.*PSFdet(:,:,(N+1)/2),[],'all'); % only at focal point/ on optical axis
+            % Lattice_SRatio(counter,1) = max(AberratedLatticePSF.*PSFdet(:,:,(N+1)/2),[],'all');
             counter = counter + 1;
         end
     end

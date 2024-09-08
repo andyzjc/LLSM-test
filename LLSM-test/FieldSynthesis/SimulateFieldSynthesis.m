@@ -8,15 +8,15 @@ addpath([pwd '/' addpath(genpath("LLSM-test/"))])
 getParameters; %modify image parameter here
 CalculatePhysics;
 
-%% detection 
-% detection
-PSFdet = getDetectionPSF;
-PSFdet = PSFdet./(max(max(max(PSFdet))));
-
-% xzPSFdet = PSFdet(:,:,(N+1)/2);
-% yzPSFdet = squeeze(PSFdet(:,(N+1)/2,:)); 
-% xzOTFdet = fftshift(fft2(ifftshift(xzPSFdet)));
-% zOTFdet = real(xzOTFdet(:,(N+1)/2));
+% %% detection 
+% % detection
+% PSFdet = getDetectionPSF;
+% PSFdet = PSFdet./(max(max(max(PSFdet))));
+% 
+% % xzPSFdet = PSFdet(:,:,(N+1)/2);
+% % yzPSFdet = squeeze(PSFdet(:,(N+1)/2,:)); 
+% % xzOTFdet = fftshift(fft2(ifftshift(xzPSFdet)));
+% % zOTFdet = real(xzOTFdet(:,(N+1)/2));
 
 %% 
 NA1 = 0.58;
